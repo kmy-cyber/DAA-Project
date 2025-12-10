@@ -1,0 +1,7 @@
+
+#report latex
+
+report/*
+!report/informe_daa.tex
+!report/*.jpeg
+!report/*pdf
