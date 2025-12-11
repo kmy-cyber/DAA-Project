@@ -150,10 +150,6 @@ Minimizar el costo total de instalación:
 
 sujeto a las restricciones anteriores.
 
-Equivalente: resolver el \textit{Minimum Degree-Constrained Spanning Tree}.
-
-.
-
 \section{Fase 2: Análisis de Complejidad Computacional}
 
 En esta fase se determina la dificultad computacional del problema formalizado en la Fase~1.
@@ -174,24 +170,23 @@ definimos la siguiente pregunta:
 \end{cases}
 \]
 
-A este problema lo llamamos \textsc{DC-MST-Decision} (Degree-Constrained Minimum Spanning Tree Decision).
-
 \subsection{Pertenencia a NP}
 
-Dado un conjunto de aristas $T$, puede verificarse en tiempo polinomial que:
+Dado un conjunto de aristas $T$, quiere verificarse que se puede comprobar en tiempo polinomial, 
+lo cual se cumplirá si se cumplen las siguientes condiciones:
 
 \begin{itemize}
-	\item $|T| = |V|-1$,
 	\item $G_T$ es conexo (mediante un recorrido BFS/DFS),
+	\item $|T| = |V|-1$, es decir el subgrafo $G_T$ forma un árbol,
 	\item $\deg_{G_T}(v) \le d(v)$ para todo $v \in V$,
 	\item $\sum_{e \in T} c(e) \le K$.
 \end{itemize}
 
-Por lo tanto, \textsc{DC-MST-Decision} pertenece a NP.
+Por lo tanto, el problema pertenece a NP.
 
 \subsection{Demostración de NP-completitud}
 
-Para demostrar que \textsc{DC-MST-Decision} es NP-completo, se presenta una 
+Para demostrar que dicho problema es NP-completo, se presenta una 
 reducción en tiempo polinomial desde el problema \textsc{Hamiltonian Path} en 
 grafos no dirigidos, el cual es NP-completo.
 
@@ -203,7 +198,7 @@ pregunta si existe un camino que visite todos los vértices exactamente una vez.
 \subsubsection{Construcción de la Reducción}
 
 A partir de una instancia de \textsc{Hamiltonian Path}, construimos una instancia 
-de \textsc{DC-MST-Decision} de la siguiente manera:
+del problema de la siguiente manera:
 
 \begin{itemize}
 	\item Se toma el mismo grafo $G=(V,E)$.
@@ -225,13 +220,12 @@ La construcción es claramente polinomial.
 \paragraph{($\Rightarrow$)}  
 Si $G$ posee un camino hamiltoniano, dicho camino contiene $|V|-1$ aristas, 
 es conexo, acíclico y cada vértice tiene grado a lo sumo $2$.  
-Por lo tanto, constituye un conjunto $T$ válido para \textsc{DC-MST-Decision} 
+Por lo tanto, constituye un conjunto $T$ válido para el problema
 con costo total $|V|-1 \le K$.
 
 \paragraph{($\Leftarrow$)}  
-Si existe un conjunto $T$ que satisface las restricciones de 
-\textsc{DC-MST-Decision}, entonces $T$ es un árbol con $|V|-1$ aristas y 
-$\deg_{G_T}(v) \le 2$ para todo $v$.  
+Si existe un conjunto $T$ que satisface las restricciones del problema,
+entonces $T$ es un árbol con $|V|-1$ aristas y $\deg_{G_T}(v) \le 2$ para todo $v$.  
 La única estructura de árbol donde todos los grados son a lo sumo $2$ es un camino.  
 Por lo tanto, $T$ es un camino hamiltoniano del grafo original.
 
