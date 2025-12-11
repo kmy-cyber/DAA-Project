@@ -1,109 +1,71 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-typedef long long ll;
-typedef pair<int,int> ii;
-typedef vector<int> vi;
-typedef vector<vi> vvi;
-typedef vector<ll> vll;
-typedef vector<ii> vii;
+using vii = vector<pair<int,int>>; // vecino, costo
+using Edge = tuple<int,int,int>; // u,v,costo
 
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-
-// bool degreeConstrainedTree(int n, vvi & g, int k) {
-//     vi deg(n, 0);
-//     vector<bool> vis(n, false);
-//     vii tree;
-
-//     queue<int> q;
-//     q.push(0);
-//     vis[0] = true;
-
-//     while (!q.empty()) {
-//         int u = q.front(); q.pop();
-
-//         for (int v : g[u]) {
-//             if (!vis[v]) {
-
-//                 if (deg[u] >= k || deg[v] >= k)
-//                     continue;
-
-//                 // add edge
-//                 tree.emplace_back(u, v);
-//                 deg[u]++; deg[v]++;
-//                 vis[v] = true;
-//                 q.push(v);
-
-//                 if ((int)tree.size() == n-1)
-//                     return true;
-//             }
-//         }
-//     }
-
-//     return false;
-// }
-
-// int main() {
-
-//     int n, m, k;
-//     cin >> n >> m >> k;
-
-//     vvi g(n);
-//     for (int i = 0; i < m; i++) {
-//         int u, v;
-//         cin >> u >> v;
-//         g[u].push_back(v);
-//         g[v].push_back(u);
-//     }
-
-//     bool ok = degreeConstrainedTree(n, g, k);
-
-//     if (ok) cout << "Se encontro un arbol abarcador con grados <= " << k << endl;
-//     else cout << "No se pudo construir" << endl;
-
-//     return 0;
-// }
-
-bool degreeConstrainedTree(int n, vector<vii>& g)
-{
-    
-    return 1;
-}
-
-int main()
-{
-    // n: numero de vertices
-    // m: numero de aristas de las que se conocen el costo
-    int n, m;
-    cin >> n >> m;
+int main(){
+    int n,m,k;
+    cin >> n >> m >> k;
 
     vector<vii> g(n);
-
-    for(int i=0;i<m;i++)
-    {
-        // <u,v> arista y c su costo
+    for(int i=0;i<m;i++){
         int u,v,c;
         cin >> u >> v >> c;
         g[u].push_back({v,c});
         g[v].push_back({u,c});
     }
 
-    bool ok = degreeConstrainedTree(n,g);
+    vector<Edge> edges;
+    for(int u=0; u<n; u++)
+        for(auto &[v,c] : g[u])
+            if(u < v) edges.push_back({u,v,c});
 
+    int sz = edges.size();
+    vector<Edge> bestTree;
+    int minCost = INT_MAX;
 
-    return 0;
+    for(int mask=0; mask < (1<<sz); mask++){
+        if(__builtin_popcount(mask) != n-1) continue;
+
+        vector<Edge> candidate;
+        for(int i=0; i<sz; i++)
+            if(mask & (1<<i)) candidate.push_back(edges[i]);
+
+        vector<int> parent(n);
+        iota(parent.begin(), parent.end(), 0);
+        auto find = [&](int x) {
+            while(parent[x]!=x) x=parent[x];
+            return x;
+        };
+        auto unite = [&](int x,int y){
+            int fx=find(x), fy=find(y);
+            if(fx==fy) return false;
+            parent[fx]=fy;
+            return true;
+        };
+
+        vector<int> deg(n,0);
+        bool valid=true;
+        int cost=0;
+        for(auto &[u,v,c] : candidate){
+            if(deg[u]+1>k || deg[v]+1>k){ valid=false; break; }
+            deg[u]++; deg[v]++;
+            if(!unite(u,v)){ valid=false; break; }
+            cost+=c;
+        }
+
+        if(valid && cost<minCost){
+            minCost=cost;
+            bestTree=candidate;
+        }
+    }
+
+    if(bestTree.empty())
+        cout << "No existe árbol con grado <= " << k << endl;
+    else{
+        cout << "Costo mínimo: " << minCost << endl;
+        for(auto &[u,v,c] : bestTree)
+            cout << u << " " << v << " (c=" << c << ")\n";
+    }
 }
