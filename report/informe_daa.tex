@@ -70,124 +70,192 @@
 \section{Fase 1: Formalización del Problema}
 
 \subsection{Descripción Formal del Problema}
-A partir de la descripción informal de ``Conectando la UH'', el objetivo de esta fase es
-traducir el problema a un modelo matemático preciso y libre de ambigüedades.
-El modelo debe especificar:
+
+El objetivo es diseñar una red de fibra óptica que conecte todos los edificios 
+principales de la Universidad de La Habana mediante enlaces posibles provistos por ETECSA. 
+Cada enlace tiene un costo de instalación y cada edificio posee un límite máximo 
+de puertos disponibles. Se requiere encontrar una configuración de conexiones que:
 
 \begin{itemize}
-    \item la estructura de los datos de entrada,
-    \item las restricciones que deben cumplirse en la solución,
-    \item y la forma en que se caracteriza una solución óptima.
+	\item conecte todos los edificios,
+	\item respete los límites de puertos por edificio,
+	\item minimice el costo total de instalación.
 \end{itemize}
 
-El problema consiste, en esencia, en determinar una configuración óptima de conexiones dentro de la Universidad de La Habana, cumpliendo condiciones específicas de conectividad, costo y estructura.
+El problema se formaliza como una variante acotada del \textit{árbol generador mínimo}.
 
 \subsection{Estructuras de Datos de Entrada}
-Para formalizar el problema, se definen las siguientes estructuras de entrada:
+
+Se define la entrada mediante las siguientes estructuras:
 
 \begin{itemize}
-    \item Un conjunto de nodos:
-    \[
-        V = \{v_1, v_2, \ldots, v_n\}
-    \]
-    representando facultades, edificios o puntos estratégicos.
-
-    \item Un conjunto de posibles conexiones (aristas):
-    \[
-        E = \{(u, v) \mid u, v \in V, u \neq v\}
-    \]
-    donde cada conexión tiene asociado un costo:
-    \[
-        c : E \rightarrow \mathbb{R}_{>0}
-    \]
-
-    \item Posibles restricciones de conectividad predefinidas, por ejemplo:
-    \[
-        R \subseteq E
-    \]
-    que representan enlaces obligatorios o prohibidos.
-
-    \item Un parámetro que determina el tipo de estructura deseada:
-    \[
-        \text{tipo} \in \{\text{árbol}, \text{grafo acotado}, \text{red redundante}\}
-    \]
+	\item Un conjunto de edificios:
+	\[
+	V = \{v_1, v_2, \ldots, v_n\}.
+	\]
+	
+	\item Un conjunto de posibles enlaces de fibra óptica:
+	\[
+	E \subseteq \{\{u,v\} \mid u,v \in V,\; u \neq v\}.
+	\]
+	
+	\item Un costo de instalación para cada enlace:
+	\[
+	c : E \rightarrow \mathbb{R}_{>0}.
+	\]
+	
+	\item Un límite de puertos (grado máximo permitido) en cada edificio:
+	\[
+	d : V \rightarrow \mathbb{Z}_{\ge 1}.
+	\]
 \end{itemize}
 
 \subsection{Formalización Matemática}
-Sea $G = (V, E)$ el grafo que representa las posibles conexiones entre puntos de la UH.
-La solución del problema consiste en encontrar un subgrafo:
 
+Sea \(G=(V,E)\) el grafo de infraestructura disponible.  
+La solución buscada es un subconjunto de aristas:
 \[
-    G' = (V', E') \quad\text{tal que}\quad V' \subseteq V,\; E' \subseteq E
+T \subseteq E
 \]
-
-que cumpla las restricciones del problema y optimice una función objetivo dada.
+que define un subgrafo \(G_T = (V, T)\).
 
 \subsection{Restricciones del Problema}
 
-Las restricciones pueden incluir:
+El subgrafo \(G_T\) debe satisfacer:
 
 \begin{enumerate}
-    \item \textbf{Conectividad global:}
-    \[
-        G' \text{ es conexo}
-    \]
-
-    \item \textbf{Respeto a enlaces obligatorios:}
-    \[
-        R_{\text{oblig}} \subseteq E'
-    \]
-
-    \item \textbf{Prohibición de ciertos enlaces:}
-    \[
-        R_{\text{prohib}} \cap E' = \emptyset
-    \]
-
-    \item \textbf{Límites estructurales:}  
-    Por ejemplo, si se desea que la solución sea un árbol:
-    \[
-        |E'| = |V'| - 1 \quad \wedge \quad G' \text{ es acíclico}
-    \]
-
-    \item \textbf{Presupuesto máximo:}
-    \[
-        \sum_{e \in E'} c(e) \leq B
-    \]
+	\item \textbf{Conectividad:}
+	\[
+	G_T \text{ es conexo}.
+	\]
+	
+	\item \textbf{Estructura de árbol:}
+	\[
+	|T| = |V| - 1.
+	\]
+	
+	\item \textbf{Límite de puertos por edificio:}
+	\[
+	\deg_{G_T}(v) \le d(v), \qquad \forall v \in V.
+	\]
 \end{enumerate}
 
-\subsection{Propiedades de una Solución Válida}
-Una solución es válida si:
-
-\begin{itemize}
-    \item cumple todas las restricciones estructurales,  
-    \item es conexa (o satisface la conectividad solicitada),  
-    \item respeta los enlaces obligatorios y prohibidos,
-    \item se mantiene dentro del presupuesto si aplica.
-\end{itemize}
-
 \subsection{Función Objetivo}
-Dependiendo del diseño seleccionado, la función objetivo puede ser:
 
-\begin{itemize}
-    \item \textbf{Minimizar el costo total de instalación}:
-    \[
-        \min \sum_{e \in E'} c(e)
-    \]
+Minimizar el costo total de instalación:
 
-    \item \textbf{Maximizar la redundancia}:
-    \[
-        \max |E'| \quad\text{bajo restricciones de costo}
-    \]
+\[
+\min_{T \subseteq E} \sum_{e \in T} c(e)
+\]
 
-    \item \textbf{Minimizar la distancia máxima entre nodos} (problema del árbol generador de diámetro mínimo):
-    \[
-        \min \max_{u, v \in V'} d_{G'}(u, v)
-    \]
-\end{itemize}
+sujeto a las restricciones anteriores.
 
-La función objetivo específica será determinada por el diseño final deseado en el contexto de ``Conectando la UH''.
+Equivalente: resolver el \textit{Minimum Degree-Constrained Spanning Tree}.
+
+.
 
 \section{Fase 2: Análisis de Complejidad Computacional}
+
+En esta fase se determina la dificultad computacional del problema formalizado en la Fase~1.
+Demostraremos que la versión de decisión del problema es NP-completa, y por lo tanto, 
+la versión de optimización es NP-dura.
+
+\subsection{Versión de Decisión del Problema}
+
+Dado un grafo $G=(V,E)$, costos $c(e)$, límites de grado $d(v)$ y un valor $K$, 
+definimos la siguiente pregunta:
+
+\[
+\text{¿Existe un subconjunto } T \subseteq E \text{ tal que }
+\begin{cases}
+	G_T = (V,T) \text{ es un árbol}, \\
+	\deg_{G_T}(v) \le d(v) \;\; \forall v \in V, \\
+	\sum_{e \in T} c(e) \le K?
+\end{cases}
+\]
+
+A este problema lo llamamos \textsc{DC-MST-Decision} (Degree-Constrained Minimum Spanning Tree Decision).
+
+\subsection{Pertenencia a NP}
+
+Dado un conjunto de aristas $T$, puede verificarse en tiempo polinomial que:
+
+\begin{itemize}
+	\item $|T| = |V|-1$,
+	\item $G_T$ es conexo (mediante un recorrido BFS/DFS),
+	\item $\deg_{G_T}(v) \le d(v)$ para todo $v \in V$,
+	\item $\sum_{e \in T} c(e) \le K$.
+\end{itemize}
+
+Por lo tanto, \textsc{DC-MST-Decision} pertenece a NP.
+
+\subsection{Demostración de NP-completitud}
+
+Para demostrar que \textsc{DC-MST-Decision} es NP-completo, se presenta una 
+reducción en tiempo polinomial desde el problema \textsc{Hamiltonian Path} en 
+grafos no dirigidos, el cual es NP-completo.
+
+\subsubsection{Problema de Partida: Hamiltonian Path}
+
+Dado un grafo no dirigido $G=(V,E)$, el problema \textsc{Hamiltonian Path} 
+pregunta si existe un camino que visite todos los vértices exactamente una vez.
+
+\subsubsection{Construcción de la Reducción}
+
+A partir de una instancia de \textsc{Hamiltonian Path}, construimos una instancia 
+de \textsc{DC-MST-Decision} de la siguiente manera:
+
+\begin{itemize}
+	\item Se toma el mismo grafo $G=(V,E)$.
+	\item Para cada arista $e \in E$, se asigna un costo $c(e)=1$.
+	\item Se fija un límite de grado uniforme:
+	\[
+	d(v) = 2 \quad \forall v \in V.
+	\]
+	\item Se establece el umbral de costo:
+	\[
+	K = |V| - 1.
+	\]
+\end{itemize}
+
+La construcción es claramente polinomial.
+
+\subsubsection{Correctitud de la Reducción}
+
+\paragraph{($\Rightarrow$)}  
+Si $G$ posee un camino hamiltoniano, dicho camino contiene $|V|-1$ aristas, 
+es conexo, acíclico y cada vértice tiene grado a lo sumo $2$.  
+Por lo tanto, constituye un conjunto $T$ válido para \textsc{DC-MST-Decision} 
+con costo total $|V|-1 \le K$.
+
+\paragraph{($\Leftarrow$)}  
+Si existe un conjunto $T$ que satisface las restricciones de 
+\textsc{DC-MST-Decision}, entonces $T$ es un árbol con $|V|-1$ aristas y 
+$\deg_{G_T}(v) \le 2$ para todo $v$.  
+La única estructura de árbol donde todos los grados son a lo sumo $2$ es un camino.  
+Por lo tanto, $T$ es un camino hamiltoniano del grafo original.
+
+\subsubsection{Conclusión}
+
+La existencia de un $T$ válido para \textsc{DC-MST-Decision} es equivalente 
+a la existencia de un camino hamiltoniano en $G$.  
+Dado que la reducción es polinomial y \textsc{Hamiltonian Path} es NP-completo, se concluye:
+
+\[
+\textsc{DC-MST-Decision} \text{ es NP-completo}.
+\]
+
+\subsection{Consecuencia}
+
+Dado que la versión de decisión es NP-completa, la versión de optimización 
+(\textit{Degree-Constrained Minimum Spanning Tree}) es NP-dura:
+
+\[
+\text{DC-MST es NP-dura}.
+\]
+
+Esto implica que no se conoce un algoritmo polinomial que resuelva el problema de forma
+óptima para instancias generales, salvo que $\mathrm{P} = \mathrm{NP}$.
 
 \section{Fase 3:  Diseño de Soluciones Algorítmicas}
 
