@@ -6,6 +6,8 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
 
 \geometry{a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
 
@@ -58,14 +60,137 @@
     {\large Carrera: Ciencia de la Computación}\\[2cm]
 
     \vfill
-    {\large today}
+    {\large \today}
 \end{titlepage}
 
 
 \tableofcontents
 \newpage
 
-\section{DAA}
+\section{Fase 1: Formalización del Problema}
 
+\subsection{Descripción Formal del Problema}
+A partir de la descripción informal de ``Conectando la UH'', el objetivo de esta fase es
+traducir el problema a un modelo matemático preciso y libre de ambigüedades.
+El modelo debe especificar:
+
+\begin{itemize}
+    \item la estructura de los datos de entrada,
+    \item las restricciones que deben cumplirse en la solución,
+    \item y la forma en que se caracteriza una solución óptima.
+\end{itemize}
+
+El problema consiste, en esencia, en determinar una configuración óptima de conexiones dentro de la Universidad de La Habana, cumpliendo condiciones específicas de conectividad, costo y estructura.
+
+\subsection{Estructuras de Datos de Entrada}
+Para formalizar el problema, se definen las siguientes estructuras de entrada:
+
+\begin{itemize}
+    \item Un conjunto de nodos:
+    \[
+        V = \{v_1, v_2, \ldots, v_n\}
+    \]
+    representando facultades, edificios o puntos estratégicos.
+
+    \item Un conjunto de posibles conexiones (aristas):
+    \[
+        E = \{(u, v) \mid u, v \in V, u \neq v\}
+    \]
+    donde cada conexión tiene asociado un costo:
+    \[
+        c : E \rightarrow \mathbb{R}_{>0}
+    \]
+
+    \item Posibles restricciones de conectividad predefinidas, por ejemplo:
+    \[
+        R \subseteq E
+    \]
+    que representan enlaces obligatorios o prohibidos.
+
+    \item Un parámetro que determina el tipo de estructura deseada:
+    \[
+        \text{tipo} \in \{\text{árbol}, \text{grafo acotado}, \text{red redundante}\}
+    \]
+\end{itemize}
+
+\subsection{Formalización Matemática}
+Sea $G = (V, E)$ el grafo que representa las posibles conexiones entre puntos de la UH.
+La solución del problema consiste en encontrar un subgrafo:
+
+\[
+    G' = (V', E') \quad\text{tal que}\quad V' \subseteq V,\; E' \subseteq E
+\]
+
+que cumpla las restricciones del problema y optimice una función objetivo dada.
+
+\subsection{Restricciones del Problema}
+
+Las restricciones pueden incluir:
+
+\begin{enumerate}
+    \item \textbf{Conectividad global:}
+    \[
+        G' \text{ es conexo}
+    \]
+
+    \item \textbf{Respeto a enlaces obligatorios:}
+    \[
+        R_{\text{oblig}} \subseteq E'
+    \]
+
+    \item \textbf{Prohibición de ciertos enlaces:}
+    \[
+        R_{\text{prohib}} \cap E' = \emptyset
+    \]
+
+    \item \textbf{Límites estructurales:}  
+    Por ejemplo, si se desea que la solución sea un árbol:
+    \[
+        |E'| = |V'| - 1 \quad \wedge \quad G' \text{ es acíclico}
+    \]
+
+    \item \textbf{Presupuesto máximo:}
+    \[
+        \sum_{e \in E'} c(e) \leq B
+    \]
+\end{enumerate}
+
+\subsection{Propiedades de una Solución Válida}
+Una solución es válida si:
+
+\begin{itemize}
+    \item cumple todas las restricciones estructurales,  
+    \item es conexa (o satisface la conectividad solicitada),  
+    \item respeta los enlaces obligatorios y prohibidos,
+    \item se mantiene dentro del presupuesto si aplica.
+\end{itemize}
+
+\subsection{Función Objetivo}
+Dependiendo del diseño seleccionado, la función objetivo puede ser:
+
+\begin{itemize}
+    \item \textbf{Minimizar el costo total de instalación}:
+    \[
+        \min \sum_{e \in E'} c(e)
+    \]
+
+    \item \textbf{Maximizar la redundancia}:
+    \[
+        \max |E'| \quad\text{bajo restricciones de costo}
+    \]
+
+    \item \textbf{Minimizar la distancia máxima entre nodos} (problema del árbol generador de diámetro mínimo):
+    \[
+        \min \max_{u, v \in V'} d_{G'}(u, v)
+    \]
+\end{itemize}
+
+La función objetivo específica será determinada por el diseño final deseado en el contexto de ``Conectando la UH''.
+
+\section{Fase 2: Análisis de Complejidad Computacional}
+
+\section{Fase 3:  Diseño de Soluciones Algorítmicas}
+
+\section{Fase 4: Implementación y Análisis Experimental}
 
 \end{document}
