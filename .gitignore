@@ -5,3 +5,90 @@ report/*
 !report/informe_daa.tex
 !report/*.jpeg
 !report/*pdf
+
+# ============================
+#  BINARIOS Y OBJETOS
+# ============================
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+
+# Archivos generados por el linker
+*.ilk
+*.map
+*.pch
+*.pdb
+
+# ============================
+#  DIRECTORIOS DE BUILD
+# ============================
+/build/
+/bin/
+/dist/
+/out/
+/debug/
+/release/
+/target/
+
+# ============================
+#  EDITORES Y ENTORNOS
+# ============================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# CLion / JetBrains
+.idea/
+cmake-build-*/
+
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+
+# ============================
+#  LOGS Y TEMPORALES
+# ============================
+*.log
+*.tmp
+*.temp
+
+# ============================
+#  PRUEBAS Y OTROS
+# ============================
+*.gcda
+*.gcno
+*.gcov
+
+# Archivos generados por valgrind
+vgcore.*
+
+# ============================
+#  SISTEMA OPERATIVO
+# ============================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Linux
+*~
+``
