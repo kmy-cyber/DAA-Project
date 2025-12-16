@@ -92,3 +92,8 @@ desktop.ini
 # Linux
 *~
 ``
+
+#
+**/main
+**/judge
+**/gen

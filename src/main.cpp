@@ -4,6 +4,11 @@ using namespace std;
 
 int main()
 {
+    // n: numero de vertices
+    // m: numero de aristas
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    
     int n,m;
     cin >> n>> m;
 
@@ -11,12 +16,14 @@ int main()
 
     for(int i=0;i< m; i++)
     {
+        // arista y el costo
         cin >> edges[i].u >> edges[i].v >> edges[i].c;
     }
 
     vi maxDeg(n);
     for(int i=0;i<n;i++)
     {
+        // grado maximo de cada vertice
         cin >> maxDeg[i];
     }
 
