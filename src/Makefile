@@ -5,8 +5,10 @@ CXXFLAGS = -O2 -Wall
 TARGET = main
 GEN    = gen
 JUDGE  = judge
+HEURISTIC = heuristic
 
 SRC_MAIN = main.cpp
+SRC_HEURISTIC= heuristic.cpp
 SRC_GEN   = test_generator.cpp
 SRC_JUDGE = judge.cpp
 
@@ -18,12 +20,12 @@ CYAN   := \033[0;36m
 RESET  := \033[0m
 
 all: $(TARGET) $(GEN) $(JUDGE)
-	@echo "$(GREEN)✨ Proyecto compilado completamente!$(RESET)"
+	@echo "$(GREEN)✨ Compilation finished successfully!$(RESET)"
 
 $(TARGET): $(SRC_MAIN)
 	@echo "$(BLUE)🚀 Compiling $(SRC)...$(RESET)"
 	$(CXX) $(CXXFLAGS) $(SRC_MAIN) -o $(TARGET)
-	@echo "$(GREEN)✅ Compilation finished successfully!$(RESET)"
+	@echo "$(GREEN)✅ Brute Force compiled!$(RESET)"
 
 # Compilar generador de tests
 $(GEN): $(SRC_GEN)
@@ -37,10 +39,11 @@ $(JUDGE): $(SRC_JUDGE)
 	$(CXX) $(CXXFLAGS) $(SRC_JUDGE) -o $(JUDGE)
 	@echo "$(GREEN)✅ Judge compiled!$(RESET)"
 
-# run: $(TARGET)
-# 	@echo "$(YELLOW)🧪 Running program...$(RESET)"
-# 	./$(TARGET) 
-# 	@echo "$(CYAN)✅ Running completed!$(RESET)"
+# Compilar juez
+$(HEURISTIC): $(SRC_HEURISTIC)
+	@echo "$(BLUE)🚀 Compiling $(SRC_HEURISTIC)...$(RESET)"
+	$(CXX) $(CXXFLAGS) $(SRC_HEURISTIC) -o $(HEURISTIC)
+	@echo "$(GREEN)✅ Heuristic compiled!$(RESET)"
 
 full: all
 	@echo "$(YELLOW)🧪 Generating tests...$(RESET)"
@@ -52,5 +55,5 @@ full: all
 
 clean:
 	@echo "$(RED)🧹 Cleaning up...$(RESET)"
-	rm -f $(TARGET) $(GEN) $(JUDGE) tests.txt input.tmp output.tmp results.txt
+	rm -f $(TARGET) $(GEN) $(JUDGE) $(HEURISTIC) tests.txt input.tmp output.tmp results.txt
 	@echo "$(RED)🗑️ Cleanup complete.$(RESET)"
