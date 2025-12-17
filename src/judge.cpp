@@ -82,6 +82,7 @@ int main() {
 
     Stats bruteStats;
     Stats heuristicStats;
+    Stats kernelStats;
 
     for (int tc = 1; tc <= T; tc++) {
 
@@ -110,6 +111,7 @@ int main() {
         // ===== Ejecutar métodos =====
         run_solver("brute", bruteStats, start);
         run_solver("heuristic", heuristicStats, start);
+        run_solver("kernel",kernelStats,start);
     }
 
     // ============ RESULTADOS ============
@@ -131,6 +133,7 @@ int main() {
 
     print_row("Brute", bruteStats);
     print_row("Heuristic", heuristicStats);
+    print_row("Kernelization", kernelStats);
 
     out.close();
     return 0;

@@ -1,6 +1,0 @@
-# Results of DAA – Degree Constrained MST
-
-| Method     | 👌 | 💥 | ⏰ | 🧠 | Final |
-|----------- |----|----|----|----|-------|
-|     Brute | 20 | 0 | 0 | 0 | ✅ |
-| Heuristic | 20 | 0 | 0 | 0 | ✅ |

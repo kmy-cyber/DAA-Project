@@ -6,11 +6,13 @@ BRUTE = brute
 GEN    = gen
 JUDGE  = judge
 HEURISTIC = heuristic
+KERNEL = kernel
 
 SRC_BRUTE = main.cpp
 SRC_HEURISTIC= heuristic.cpp
 SRC_GEN   = test_generator.cpp
 SRC_JUDGE = judge.cpp
+SRC_KERNEL = kernel.cpp
 
 RED    := \033[0;31m
 GREEN  := \033[0;32m
@@ -19,13 +21,18 @@ BLUE   := \033[0;34m
 CYAN   := \033[0;36m
 RESET  := \033[0m
 
-all: $(BRUTE) $(HEURISTIC) $(GEN) $(JUDGE)
+all: $(BRUTE) $(HEURISTIC) $(KERNEL) $(GEN) $(JUDGE) 
 	@echo "$(GREEN)✨ Compilation finished successfully!$(RESET)"
 
 $(BRUTE): $(SRC_BRUTE)
 	@echo "$(BLUE)🚀 Compiling $(SRC_BRUTE)...$(RESET)"
 	$(CXX) $(CXXFLAGS) $(SRC_BRUTE) -o $(BRUTE)
 	@echo "$(GREEN)✅ Brute Force compiled!$(RESET)"
+
+$(KERNEL): $(SRC_KERNEL)
+	@echo "$(BLUE)🚀 Compiling $(SRC_KERNEL)...$(RESET)"
+	$(CXX) $(CXXFLAGS) $(SRC_KERNEL) -o $(KERNEL)
+	@echo "$(GREEN)✅ Kernel compiled!$(RESET)"
 
 # Compilar generador de tests
 $(GEN): $(SRC_GEN)
@@ -55,5 +62,5 @@ full: all
 
 clean:
 	@echo "$(RED)🧹 Cleaning up...$(RESET)"
-	rm -f $(BRUTE) $(GEN) $(JUDGE) $(HEURISTIC) tests.txt input.tmp output.tmp results.txt
+	rm -f $(BRUTE) $(GEN) $(JUDGE) $(HEURISTIC) $(KERNEL) tests.txt input.tmp output.tmp results.txt
 	@echo "$(RED)🗑️ Cleanup complete.$(RESET)"
