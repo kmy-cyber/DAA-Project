@@ -94,6 +94,7 @@ desktop.ini
 ``
 
 #
-**/main
+**/brute
+**/heuristic
 **/judge
 **/gen

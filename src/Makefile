@@ -2,12 +2,12 @@
 CXX = g++
 CXXFLAGS = -O2 -Wall
 # Nombre del ejecutable
-TARGET = main
+BRUTE = brute
 GEN    = gen
 JUDGE  = judge
 HEURISTIC = heuristic
 
-SRC_MAIN = main.cpp
+SRC_BRUTE = main.cpp
 SRC_HEURISTIC= heuristic.cpp
 SRC_GEN   = test_generator.cpp
 SRC_JUDGE = judge.cpp
@@ -19,12 +19,12 @@ BLUE   := \033[0;34m
 CYAN   := \033[0;36m
 RESET  := \033[0m
 
-all: $(TARGET) $(GEN) $(JUDGE)
+all: $(BRUTE) $(HEURISTIC) $(GEN) $(JUDGE)
 	@echo "$(GREEN)✨ Compilation finished successfully!$(RESET)"
 
-$(TARGET): $(SRC_MAIN)
-	@echo "$(BLUE)🚀 Compiling $(SRC)...$(RESET)"
-	$(CXX) $(CXXFLAGS) $(SRC_MAIN) -o $(TARGET)
+$(BRUTE): $(SRC_BRUTE)
+	@echo "$(BLUE)🚀 Compiling $(SRC_BRUTE)...$(RESET)"
+	$(CXX) $(CXXFLAGS) $(SRC_BRUTE) -o $(BRUTE)
 	@echo "$(GREEN)✅ Brute Force compiled!$(RESET)"
 
 # Compilar generador de tests
@@ -55,5 +55,5 @@ full: all
 
 clean:
 	@echo "$(RED)🧹 Cleaning up...$(RESET)"
-	rm -f $(TARGET) $(GEN) $(JUDGE) $(HEURISTIC) tests.txt input.tmp output.tmp results.txt
+	rm -f $(BRUTE) $(GEN) $(JUDGE) $(HEURISTIC) tests.txt input.tmp output.tmp results.txt
 	@echo "$(RED)🗑️ Cleanup complete.$(RESET)"
