@@ -1,19 +1,19 @@
 #include <bits/stdc++.h>
+#include "edge.hpp"
+#include "types.hpp"
 using namespace std;
-
-struct Edge { int u,v,c; };
 
 int rnd(mt19937 &rng, int l, int r) {
     return uniform_int_distribution<int>(l, r)(rng);
 }
 
 int main() {
-    const int SEED = 123456;   // 🔒 semilla fija
+    const int SEED = 47;  
     mt19937 rng(SEED);
 
     ofstream out("tests.txt");
 
-    int T = 20;   // número de casos
+    int T = 20;   
     out << T << "\n";
 
     for (int tc = 1; tc <= T; tc++) {
@@ -21,7 +21,7 @@ int main() {
         int extra = rnd(rng, 0, n);
         int maxCost = 100;
 
-        vector<Edge> edges;
+        vEdges edges;
 
         // Árbol base
         for (int i = 1; i < n; i++) {
@@ -29,7 +29,7 @@ int main() {
             edges.push_back({p, i, rnd(rng, 1, maxCost)});
         }
 
-        set<pair<int,int>> used;
+        set<ii> used;
         for (auto &e : edges) {
             used.insert({min(e.u,e.v), max(e.u,e.v)});
         }
@@ -45,7 +45,7 @@ int main() {
             edges.push_back({u, v, rnd(rng, 1, maxCost)});
         }
 
-        vector<int> maxDeg(n);
+        vi maxDeg(n);
         for (int i = 0; i < n; i++)
             maxDeg[i] = rnd(rng, 1, min(4, n-1));
 

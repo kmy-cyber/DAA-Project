@@ -2,30 +2,28 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <sys/resource.h>
+#include "basic.hpp"
 using namespace std;
 
-// ⏱️ Tiempo máximo por caso
-const double TIME_LIMIT = 10.0; // segundos
-
-// 🧠 Memoria máxima por ejecución
-const long long MEM_LIMIT = 512LL * 1024 * 1024; // 512 MB
 
 int main() {
     ifstream in("tests.txt");
     ofstream out("results.txt");
 
+    if (!in) {
+        cerr << "Error: tests.txt not found\n";
+        return 1;
+    }
+
     int T;
     in >> T;
 
-    out << "Case | Result | Time\n";
-    out << "----------------------\n";
+    Stats stats;
 
     for (int tc = 1; tc <= T; tc++) {
-        /* ===============================
-           Guardar caso actual en input.tmp
-           =============================== */
-        ofstream tmp("input.tmp");
 
+        // Guardar input del caso
+        ofstream tmp("input.tmp");
         int n, m;
         in >> n >> m;
         tmp << n << " " << m << "\n";
@@ -37,26 +35,21 @@ int main() {
         }
 
         for (int i = 0; i < n; i++) {
-            int d; 
+            int d;
             in >> d;
             tmp << d << (i + 1 < n ? ' ' : '\n');
         }
         tmp.close();
 
         auto start = chrono::high_resolution_clock::now();
-
         pid_t pid = fork();
 
-        /* ===============================
-           PROCESO HIJO → ejecutar solver
-           =============================== */
+        // ================= HIJO =================
         if (pid == 0) {
-            // ⏱️ Límite de CPU (backup del timer externo)
             rlimit cpu;
             cpu.rlim_cur = cpu.rlim_max = (rlim_t)(TIME_LIMIT + 1);
             setrlimit(RLIMIT_CPU, &cpu);
 
-            // 🧠 Límite de memoria virtual
             rlimit mem;
             mem.rlim_cur = mem.rlim_max = MEM_LIMIT;
             setrlimit(RLIMIT_AS, &mem);
@@ -69,14 +62,11 @@ int main() {
                 perror("freopen output.tmp");
                 exit(1);
             }
-            
             execl("./main", "./main", nullptr);
-            exit(1); // si execl falla
+            exit(1);
         }
 
-        /* ===============================
-           PROCESO PADRE → juez
-           =============================== */
+        // ================= PADRE =================
         int status = 0;
         bool tle = false;
 
@@ -95,39 +85,41 @@ int main() {
             }
         }
 
-        auto end = chrono::high_resolution_clock::now();
-        double elapsed =
-            chrono::duration<double>(end - start).count();
-
-        /* ===============================
-           Decidir resultado
-           =============================== */
-        string result;
-
         if (tle) {
-            result = "⏱️";
+            stats.tle++;
         }
         else if (WIFSIGNALED(status)) {
             int sig = WTERMSIG(status);
-
-            if (sig == SIGKILL || sig == SIGSEGV || sig == SIGABRT) {
-                result = "🧠";  // Memory limit / stack overflow
-            } else {
-                result = "💥";  // Runtime error
-            }
+            if (sig == SIGSEGV || sig == SIGKILL || sig == SIGABRT)
+                stats.mle++;
+            else
+                stats.re++;
         }
         else if (WEXITSTATUS(status) != 0) {
-            result = "💥";
+            stats.re++;
         }
         else {
-            // aquí luego puedes meter checker vs brute
-            result = "✅";
+            stats.ok++;
         }
-
-        out << setw(4) << tc << " | " << result
-            << " | " << fixed << setprecision(3)
-            << elapsed << "s\n";
     }
+
+    // ================= SALIDA FINAL =================
+    out << "# Results of DAA – Degree Constrained MST\n\n";
+    out << "| Method             | 👌  | 👎  | 💥  | ⏰  | 🧠  | Final |\n";
+    out << "| -----------------  | --- | --- | ---  | --- | ---  | ----- |\n";
+
+    string finalResult =
+        (stats.wrong == 0 && stats.re == 0 &&
+         stats.tle == 0 && stats.mle == 0)
+        ? "✅" : "❌";
+
+    out << "|   Brute Force      | "
+        << stats.ok << "  | "
+        << stats.wrong << "   | "
+        << stats.re << "    |  "
+        << stats.tle << "  |  "
+        << stats.mle << "   |  "
+        << finalResult << "   | \n";
 
     out.close();
     return 0;

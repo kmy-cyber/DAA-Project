@@ -1,5 +1,7 @@
 
-## Conectando la UH
+# Conectando la Universidad de la Habana (UH)
+
+## Descripción del Problema:
 
 La Universidad de La Habana (UH), en su constante búsqueda de la excelencia académica y la innovación, se ha embarcado en un proyecto crucial para modernizar y expandir su infraestructura de red. Nuestro objetivo es dotar a todas nuestras facultades, centros de investigación y edificios administrativos con conectividad de fibra óptica de alta velocidad. Para este fin, contamos con el valioso apoyo técnico y logístico de ETECSA (Empresa de Telecomunicaciones de Cuba S.A.).
 
@@ -16,3 +18,32 @@ Nuestro objetivo principal es diseñar la red de fibra óptica que conecte todo
 3. El costo total de instalación de toda la red sea el mínimo posible.
 
 Una planificación subóptima podría resultar en un sobrecosto significativo para la universidad, la necesidad de adquirir hardware de red adicional no previsto, o en una red ineficiente que no cumpla con las especificaciones técnicas y presupuestarias acordadas con ETECSA.
+
+---
+
+##  Requisitos:
+
+- `g++` (compatible con C++11 o superior)
+- Sistema tipo Linux / WSL / macOS
+- Make (opcional pero recomendado)
+
+---
+
+## Primeros pasos
+
+1. Clonar el repositorio:
+
+```bash
+git clone https://github.com/kmy-cyber/DAA-Project.git
+cd DAA-Project/src
+```
+
+2. Compilar todo usando el Makefile:
+
+```bash
+make all
+make full
+make clean
+```
+
+---
