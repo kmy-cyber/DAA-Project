@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
-#include "edge.hpp"
-#include "dsu.hpp"
+#include "../utils/edge.hpp"
+#include "../utils/dsu.hpp"
 using namespace std;
 
 /* ==========================
@@ -12,7 +12,7 @@ double penalized_cost(const Edge &e,
                       double alpha) {
     double pu = (double)deg[e.u] / lim[e.u];
     double pv = (double)deg[e.v] / lim[e.v];
-    return e.c * (1.0 + alpha * (pu + pv));
+    return e.w * (1.0 + alpha * (pu + pv));
 }
 
 /* ==========================
@@ -27,7 +27,7 @@ int main() {
 
     vector<Edge> edges(m);
     for (int i = 0; i < m; i++) {
-        cin >> edges[i].u >> edges[i].v >> edges[i].c;
+        cin >> edges[i].u >> edges[i].v >> edges[i].w;
     }
 
     vector<int> deg_limit(n);
@@ -99,11 +99,11 @@ int main() {
        ========================== */
     long long total_cost = 0;
     for (auto &e : result)
-        total_cost += e.c;
+        total_cost += e.w;
 
     cout << total_cost << "\n";
     for (auto &e : result) {
-        cout << e.u << " " << e.v << " " << e.c << "\n";
+        cout << e.u << " " << e.v << " " << e.w << "\n";
     }
 
     return 0;

@@ -1,8 +1,8 @@
 #pragma once
 #include <bits/stdc++.h>
-#include "edge.hpp"
-#include "dsu.hpp"
-#include "types.hpp"
+#include "../utils/edge.hpp"
+#include "../utils/dsu.hpp"
+#include "../utils/types.hpp"
 
 // itera por todos los conjuntos de aristas, verifica que comprueba las restricciones
 // si las cumples, entonces actualiza con la mejor solucion encontrada
@@ -46,7 +46,7 @@ degreeConstrainedMST(int n,
                 break;
             }
 
-            cost += e.c;
+            cost += e.w;
         }
 
         if(valid && cost < bestCost) {

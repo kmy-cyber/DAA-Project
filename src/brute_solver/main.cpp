@@ -17,7 +17,7 @@ int main()
     for(int i=0;i< m; i++)
     {
         // arista y el costo
-        cin >> edges[i].u >> edges[i].v >> edges[i].c;
+        cin >> edges[i].u >> edges[i].v >> edges[i].w;
     }
 
     vi maxDeg(n);
@@ -39,7 +39,7 @@ int main()
 
     for (auto &e : tree)
     {
-        cout << e.u << " " << e.v << " " << e.c << endl;
+        cout << e.u << " " << e.v << " " << e.w << endl;
     }
 
     return 0;

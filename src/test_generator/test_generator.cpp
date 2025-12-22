@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
-#include "edge.hpp"
-#include "types.hpp"
+#include "../utils/edge.hpp"
+#include "../utils/types.hpp"
 using namespace std;
 
 int rnd(mt19937 &rng, int l, int r) {
@@ -52,7 +52,7 @@ int main() {
         // output caso
         out << n << " " << edges.size() << "\n";
         for (auto &e : edges)
-            out << e.u << " " << e.v << " " << e.c << "\n";
+            out << e.u << " " << e.v << " " << e.w << "\n";
         for (int i = 0; i < n; i++)
             out << maxDeg[i] << (i+1<n?' ':'\n');
     }

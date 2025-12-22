@@ -2,17 +2,19 @@
 CXX = g++
 CXXFLAGS = -O2 -Wall
 # Nombre del ejecutable
-BRUTE = brute
-GEN    = gen
-JUDGE  = judge
-HEURISTIC = heuristic
-KERNEL = kernel
+BRUTE = brute.exe
+GEN    = gen.exe
+JUDGE  = judge.exe
+HEURISTIC = heuristic.exe
+KERNEL = kernel.exe
+DCMST = dcmst.exe
 
-SRC_BRUTE = main.cpp
-SRC_HEURISTIC= heuristic.cpp
-SRC_GEN   = test_generator.cpp
-SRC_JUDGE = judge.cpp
-SRC_KERNEL = kernel.cpp
+SRC_BRUTE = brute_solver/main.cpp
+SRC_HEURISTIC= heuristic_sol/heuristic.cpp
+SRC_GEN   = test_generator/test_generator.cpp
+SRC_JUDGE = judging/judge.cpp
+SRC_KERNEL = kernel/kernel.cpp
+SRC_DCMST = dcmst_sol/dcmst.cpp
 
 RED    := \033[0;31m
 GREEN  := \033[0;32m
@@ -21,7 +23,7 @@ BLUE   := \033[0;34m
 CYAN   := \033[0;36m
 RESET  := \033[0m
 
-all: $(BRUTE) $(HEURISTIC) $(KERNEL) $(GEN) $(JUDGE) 
+all: $(BRUTE) $(HEURISTIC) $(KERNEL) $(DCMST) $(GEN) $(JUDGE) 
 	@echo "$(GREEN)✨ Compilation finished successfully!$(RESET)"
 
 $(BRUTE): $(SRC_BRUTE)
@@ -33,6 +35,11 @@ $(KERNEL): $(SRC_KERNEL)
 	@echo "$(BLUE)🚀 Compiling $(SRC_KERNEL)...$(RESET)"
 	$(CXX) $(CXXFLAGS) $(SRC_KERNEL) -o $(KERNEL)
 	@echo "$(GREEN)✅ Kernel compiled!$(RESET)"
+
+$(DCMST): $(SRC_DCMST)
+	@echo "$(BLUE)🚀 Compiling $(SRC_DCMST)...$(RESET)"
+	$(CXX) $(CXXFLAGS) $(SRC_DCMST) -o $(DCMST)
+	@echo "$(GREEN)✅ DCMST compiled!$(RESET)"
 
 # Compilar generador de tests
 $(GEN): $(SRC_GEN)
@@ -62,5 +69,5 @@ full: all
 
 clean:
 	@echo "$(RED)🧹 Cleaning up...$(RESET)"
-	rm -f $(BRUTE) $(GEN) $(JUDGE) $(HEURISTIC) $(KERNEL) tests.txt input.tmp output.tmp results.txt
+	rm -f $(BRUTE) $(GEN) $(JUDGE) $(HEURISTIC) $(DCMST) $(KERNEL) tests.txt input.tmp output.tmp results.txt
 	@echo "$(RED)🗑️ Cleanup complete.$(RESET)"

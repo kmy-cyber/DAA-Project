@@ -1,34 +1,31 @@
 #include <bits/stdc++.h>
-#include "edge.hpp"
-#include "dsu.hpp"
+#include "../utils/edge.hpp"
+#include "../utils/dsu.hpp"
 using namespace std;
 
-/* ==========================
-   Kernelization
-   ========================== */
-vector<Edge> kernelize(
+vEdges kernelize(
     int n,
-    const vector<Edge>& edges,
-    const vector<int>& deg_limit
+    const vEdges & edges,
+    const vi & deg_limit
 ) {
-    vector<vector<Edge>> adj(n);
+    vector<vEdges> adj(n);
 
     for (auto &e : edges) {
         if (deg_limit[e.u] > 0 && deg_limit[e.v] > 0) {
             adj[e.u].push_back(e);
-            adj[e.v].push_back({e.v, e.u, e.c});
+            adj[e.v].push_back({e.v, e.u, e.w});
         }
     }
 
     int maxD = *max_element(deg_limit.begin(), deg_limit.end());
     int K = max(2, 2 * maxD);
 
-    vector<Edge> kernel;
+    vEdges kernel;
 
     for (int u = 0; u < n; u++) {
         auto &v = adj[u];
         sort(v.begin(), v.end(),
-             [](auto &a, auto &b) { return a.c < b.c; });
+             [](auto &a, auto &b) { return a.w < b.w; });
 
         for (int i = 0; i < (int)v.size() && i < K; i++) {
             if (u < v[i].v) kernel.push_back(v[i]);
@@ -48,25 +45,25 @@ int main() {
     int n, m;
     cin >> n >> m;
 
-    vector<Edge> edges(m);
+    vEdges edges(m);
     for (int i = 0; i < m; i++)
-        cin >> edges[i].u >> edges[i].v >> edges[i].c;
+        cin >> edges[i].u >> edges[i].v >> edges[i].w;
 
-    vector<int> deg_limit(n);
+    vi deg_limit(n);
     for (int i = 0; i < n; i++)
         cin >> deg_limit[i];
 
     /* ==========================
        Kernelization step
        ========================== */
-    vector<Edge> kernel = kernelize(n, edges, deg_limit);
+    vEdges kernel = kernelize(n, edges, deg_limit);
 
     sort(kernel.begin(), kernel.end(),
-         [](auto &a, auto &b) { return a.c < b.c; });
+         [](auto &a, auto &b) { return a.w < b.w; });
 
     DSU dsu(n);
-    vector<int> deg(n, 0);
-    vector<Edge> result;
+    vi deg(n, 0);
+    vEdges result;
 
     /* ==========================
        Kruskal with degree bounds
@@ -87,13 +84,13 @@ int main() {
     /* ==========================
        Output
        ========================== */
-    long long total_cost = 0;
+    ll total_cost = 0;
     for (auto &e : result)
-        total_cost += e.c;
+        total_cost += e.w;
 
     cout << total_cost << "\n";
     for (auto &e : result)
-        cout << e.u << " " << e.v << " " << e.c << "\n";
+        cout << e.u << " " << e.v << " " << e.w << "\n";
 
     return 0;
 }
