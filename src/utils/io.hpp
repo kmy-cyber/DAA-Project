@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include "graph.hpp"
+#include "types.hpp"
 
 namespace IO {
 
@@ -29,7 +30,7 @@ inline void printSolution(const std::vector<Edge>& T) {
         return;
     }
 
-    long long cost = 0;
+    ll cost = 0;
     for (auto& e : T) cost += e.w;
 
     std::cout << cost << "\n";

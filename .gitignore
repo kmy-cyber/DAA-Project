@@ -94,10 +94,9 @@ desktop.ini
 ``
 
 #
-**/brute
-**/heuristic
-**/judge
-**/gen
+src/bin
+src/outputs
+src/logs
 
 
 article

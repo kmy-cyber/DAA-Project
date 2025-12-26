@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <numeric>
 #include "types.hpp"
 
 
