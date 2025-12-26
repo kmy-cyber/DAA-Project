@@ -64,7 +64,12 @@ full: all gen-tests
 	./$(JUDGE)
 	@echo "$(CYAN)📄 Results in logs$(RESET)"
 
+one: all
+	@echo "$(YELLOW)🧪 Running judge...$(RESET)"
+	./$(JUDGE)
+	@echo "$(CYAN)📄 Results in logs$(RESET)"
+
 clean:
 	@echo "$(RED)🧹 Cleaning up...$(RESET)"
-	rm -rf bin outputs logs tests
+	rm -rf bin outputs logs 
 	@echo "$(RED)🗑️ Cleanup complete.$(RESET)"

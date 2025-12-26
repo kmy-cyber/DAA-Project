@@ -7,7 +7,7 @@ struct Stat {
     string test;
     string status;
     double time_ms;
-    int memory; // KB
+    int memory; 
 };
 
 int main() {
@@ -15,7 +15,8 @@ int main() {
         "bin/brute",
         "bin/dcmst"
     };
-    (void) system("mkdir -p outputs logs");
+    int ret = system("mkdir -p outputs logs");
+    (void)ret; 
 
     vector<fs::path> tests;
     for (const auto &e : fs::directory_iterator("tests"))
@@ -45,7 +46,7 @@ int main() {
             if (ret != 0) {
                 status = "RE";
             } else {
-                ret = system(("./checker " + test_path.string() + " " + out +
+                ret = system(("bin/checker " + test_path.string() + " " + out +
                               " > /dev/null 2>&1").c_str());
                 status = (ret == 0 ? "OK" : "WA");
             }
