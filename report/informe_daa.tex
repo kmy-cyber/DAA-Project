@@ -67,9 +67,54 @@
 \tableofcontents
 \newpage
 
-\section{Fase 1: Formalización del Problema}
+\begin{center}
+\LARGE \textbf{Problema}
+\end{center}
+\addcontentsline{toc}{section}{Problema}
 
-\subsection{Descripción Formal del Problema}
+La Universidad de La Habana, en su constante búsqueda de la excelencia académica y la innovación, 
+se ha embarcado en un proyecto crucial para modernizar y expandir su infraestructura de red. Nuestro 
+objetivo es dotar a todas nuestras facultades, centros de investigación y edificios administrativos con
+conectividad de fibra óptica de alta velocidad. Para este fin, contamos con el valioso apoyo técnico y
+logístico de ETECSA (Empresa de Telecomunicaciones de Cuba S.A.).
+
+Nos enfrentamos a un desafío de diseño de red que requiere una solución óptima. Necesitamos 
+interconectar todos los edificios principales de la UH con fibra óptica, creando una red robusta 
+y eficiente. Cada posible conexión de fibra entre dos edificios tiene un costo de instalación asociado,
+que incluye desde los permisos internos y la mano de obra especializada de ETECSA hasta los materiales
+y las obras civiles necesarias.
+
+Sin embargo, ETECSA ha establecido una restricción técnica fundamental que debemos respetar:  
+
+En cada edificio, la conexión de la fibra óptica se gestionará a través de un equipo de red central 
+(un router o switch principal) que ellos nos proporcionan. Estos equipos tienen una capacidad limitada 
+de puertos. Esto significa que un equipo en un edificio específico solo puede manejar un número máximo 
+de conexiones de fibra óptica directas a otros edificios. Exceder este límite implicaría la necesidad 
+de instalar equipos adicionales mucho más caros y complejos, o la implementación de soluciones de red 
+alternativas que ETECSA no puede garantizar o que dispararían drásticamente el presupuesto del proyecto.
+
+Nuestro objetivo principal es diseñar la red de fibra óptica que conecte todos nuestros edificios 
+principales de la manera más económica posible. Esto implica seleccionar las rutas de fibra de tal 
+forma que:
+
+\begin{enumerate}
+	\item Todos los edificios estén interconectados a la red principal de la universidad, sin crear bucles 
+innecesarios (buscamos una estructura de red eficiente).
+	\item Ningún equipo de red en ningún edificio exceda su capacidad máxima de conexiones directas 
+(es decir, el número de cables de fibra que llegan o salen de un edificio no puede superar el límite 
+de puertos del equipo de ETECSA).
+	\item El costo total de instalación de toda la red sea el mínimo posible.
+\end{enumerate}
+
+Una planificación subóptima podría resultar en un sobrecosto significativo para la universidad, la 
+necesidad de adquirir hardware de red adicional no previsto, o en una red ineficiente que no cumpla 
+con las especificaciones técnicas y presupuestarias acordadas con ETECSA.
+
+\clearpage
+\begin{center}
+\LARGE \textbf{Formalización del Problema}
+\end{center}
+\addcontentsline{toc}{section}{Fase 1: Formalización del Problema}
 
 El objetivo es diseñar una red de fibra óptica que conecte todos los edificios 
 principales de la Universidad de La Habana mediante enlaces posibles provistos por ETECSA. 
@@ -82,11 +127,10 @@ de puertos disponibles. Se requiere encontrar una configuración de conexiones q
 	\item minimice el costo total de instalación.
 \end{itemize}
 
-El problema se formaliza como una variante acotada del \textit{árbol generador mínimo}.
+\subsection*{Notaci\'on}
+\addcontentsline{toc}{subsection}{Notaci\'on}
 
-\subsection{Estructuras de Datos de Entrada}
-
-Se define la entrada mediante las siguientes estructuras:
+En el lenguaje matemático, podemos definir la estructura del problema como un grafo simple y no dirigido $G=(V,E)$, donde:
 
 \begin{itemize}
 	\item Un conjunto de edificios:
@@ -94,7 +138,7 @@ Se define la entrada mediante las siguientes estructuras:
 	V = \{v_1, v_2, \ldots, v_n\}.
 	\]
 	
-	\item Un conjunto de posibles enlaces de fibra óptica:
+	\item Un conjunto de posibles enlaces de fibra óptica: $E=(e_1,e_2,...,e_m)$
 	\[
 	E \subseteq \{\{u,v\} \mid u,v \in V,\; u \neq v\}.
 	\]
@@ -110,53 +154,52 @@ Se define la entrada mediante las siguientes estructuras:
 	\]
 \end{itemize}
 
-\subsection{Formalización Matemática}
+\subsection*{Restricciones del Problema}
+\addcontentsline{toc}{subsection}{Restricciones del Problema}
 
-Sea \(G=(V,E)\) el grafo de infraestructura disponible.  
-La solución buscada es un subconjunto de aristas:
-\[
-T \subseteq E
-\]
-que define un subgrafo \(G_T = (V, T)\).
-
-\subsection{Restricciones del Problema}
-
-El subgrafo \(G_T\) debe satisfacer:
+Sea un subgrafo de G como \(T=(V^T,E^T)\) debe satisfacer que:
 
 \begin{enumerate}
+
 	\item \textbf{Conectividad:}
 	\[
-	G_T \text{ es conexo}.
+	T \text{ es conexo } \rightarrow V^T = V
 	\]
 	
 	\item \textbf{Estructura de árbol:}
 	\[
-	|T| = |V| - 1.
+	T \text{ no contiene ciclos} \rightarrow |E^T| = |V| - 1.
 	\]
 	
 	\item \textbf{Límite de puertos por edificio:}
 	\[
-	\deg_{G_T}(v) \le d(v), \qquad \forall v \in V.
+	\deg_{T}(v) \le d(v), \qquad \forall v \in V.
 	\]
 \end{enumerate}
 
-\subsection{Función Objetivo}
+donde se define $deg_{T}(v)$ como el grado del v\'ertice $v$ (tambi\'en llamado cardinalidad de su vecindad) en el grafo T.
+Se desea conseguir el subgrafo $T$ tal que minimiza el costo de la suma de los pesos de sus aristas, es decir:
 
-Minimizar el costo total de instalación:
-
-\[
-\min_{T \subseteq E} \sum_{e \in T} c(e)
-\]
+\begin{enumerate}
+	\item \textbf{Funci\'on objetivo:}
+	\[
+	\min_{T \subseteq E} \sum_{e \in T} c(e)
+	\]
+\end{enumerate}
 
 sujeto a las restricciones anteriores.
 
-\section{Fase 2: Análisis de Complejidad Computacional}
+\newpage
+\begin{center}
+\LARGE \textbf{Análisis de Complejidad Computacional}
+\end{center}
+\addcontentsline{toc}{section}{Fase 2: Análisis de Complejidad Computacional}
 
 En esta fase se determina la dificultad computacional del problema formalizado en la Fase~1.
 Demostraremos que la versión de decisión del problema es NP-completa, y por lo tanto, 
 la versión de optimización es NP-dura.
 
-\subsection{Versión de Decisión del Problema}
+\subsection*{Versión de Decisión del Problema}
 
 Dado un grafo $G=(V,E)$, costos $c(e)$, límites de grado $d(v)$ y un valor $K$, 
 definimos la siguiente pregunta:
@@ -170,7 +213,7 @@ definimos la siguiente pregunta:
 \end{cases}
 \]
 
-\subsection{Pertenencia a NP}
+\subsection*{Pertenencia a NP}
 
 Dado un conjunto de aristas $T$, quiere verificarse que se puede comprobar en tiempo polinomial, 
 lo cual se cumplirá si se cumplen las siguientes condiciones:
@@ -184,18 +227,18 @@ lo cual se cumplirá si se cumplen las siguientes condiciones:
 
 Por lo tanto, el problema pertenece a NP.
 
-\subsection{Demostración de NP-completitud}
+\subsection*{Demostración de NP-completitud}
 
 Para demostrar que dicho problema es NP-completo, se presenta una 
 reducción en tiempo polinomial desde el problema \textsc{Hamiltonian Path} en 
 grafos no dirigidos, el cual es NP-completo.
 
-\subsubsection{Problema de Partida: Hamiltonian Path}
+\subsubsection*{Problema de Partida: Hamiltonian Path}
 
 Dado un grafo no dirigido $G=(V,E)$, el problema \textsc{Hamiltonian Path} 
 pregunta si existe un camino que visite todos los vértices exactamente una vez.
 
-\subsubsection{Construcción de la Reducción}
+\subsubsection*{Construcción de la Reducción}
 
 A partir de una instancia de \textsc{Hamiltonian Path}, construimos una instancia 
 del problema de la siguiente manera:
@@ -215,7 +258,7 @@ del problema de la siguiente manera:
 
 La construcción es claramente polinomial.
 
-\subsubsection{Correctitud de la Reducción}
+\subsubsection*{Correctitud de la Reducción}
 
 \paragraph{($\Rightarrow$)}  
 Si $G$ posee un camino hamiltoniano, dicho camino contiene $|V|-1$ aristas, 
@@ -229,7 +272,7 @@ entonces $T$ es un árbol con $|V|-1$ aristas y $\deg_{G_T}(v) \le 2$ para todo 
 La única estructura de árbol donde todos los grados son a lo sumo $2$ es un camino.  
 Por lo tanto, $T$ es un camino hamiltoniano del grafo original.
 
-\subsubsection{Conclusión}
+\subsubsection*{Conclusión}
 
 La existencia de un $T$ válido para \textsc{DC-MST-Decision} es equivalente 
 a la existencia de un camino hamiltoniano en $G$.  
@@ -239,7 +282,7 @@ Dado que la reducción es polinomial y \textsc{Hamiltonian Path} es NP-completo,
 \textsc{DC-MST-Decision} \text{ es NP-completo}.
 \]
 
-\subsection{Consecuencia}
+\subsection*{Consecuencia}
 
 Dado que la versión de decisión es NP-completa, la versión de optimización 
 (\textit{Degree-Constrained Minimum Spanning Tree}) es NP-dura:
@@ -251,8 +294,317 @@ Dado que la versión de decisión es NP-completa, la versión de optimización
 Esto implica que no se conoce un algoritmo polinomial que resuelva el problema de forma
 óptima para instancias generales, salvo que $\mathrm{P} = \mathrm{NP}$.
 
-\section{Fase 3:  Diseño de Soluciones Algorítmicas}
+\newpage
+\begin{center}
+\LARGE \textbf{Diseño de Soluciones Algorítmicas}
+\end{center}
+\addcontentsline{toc}{section}{Fase 3: Diseño de Soluciones Algorítmicas}
 
-\section{Fase 4: Implementación y Análisis Experimental}
+El problema de construir un árbol expansivo con restricciones de grado
+(DC-MST) es NP-difícil, lo que implica que no existe un algoritmo
+polinomial conocido capaz de garantizar la solución óptima para
+instancias generales. Por ello, en esta sección se exploran distintas
+estrategias algorítmicas para abordar el problema, combinando
+métodos exactos y heurísticos.
+
+Presentaremos los algoritmos propuestos de manera estructurada,
+incluyendo:
+
+\begin{itemize}
+    \item Una descripción de la idea principal de cada algoritmo.
+    \item El pseudocódigo correspondiente para su implementación.
+    \item El análisis de complejidad computacional.
+\end{itemize}
+
+Esto permitirá evaluar las ventajas y limitaciones de cada enfoque,
+y proporcionará una base sólida para la implementación experimental
+y la comparación de resultados en la Fase 4.
+
+\subsection*{Algoritmo de Fuerza Bruta: Exploración Exhaustiva del Espacio de Árboles Expansivos}
+\addcontentsline{toc}{subsection}{Algoritmo de Fuerza Bruta: Exploración Exhaustiva del Espacio de Árboles Expansivos}
+
+Dado que el problema de encontrar un árbol expansivo de costo mínimo con
+restricciones de grado es NP-difícil, una primera aproximación consiste en
+analizar exhaustivamente todas las posibles soluciones y seleccionar aquella
+que cumple las restricciones y minimiza el costo total.
+
+Un candidato a solución válida debe ser un \textbf{árbol expansivo}, es decir,
+un subgrafo conexo y acíclico que contiene todos los vértices del grafo y
+exactamente $|V|-1$ aristas. El algoritmo de fuerza bruta consiste en enumerar
+todos los subconjuntos de aristas del grafo y verificar cuáles de ellos cumplen
+las condiciones necesarias para ser un árbol expansivo factible.
+
+\subsubsection*{Idea del Algoritmo}
+
+Sea $G=(V,E)$ un grafo no dirigido con $|V|=n$ vértices y $|E|=m$ aristas.
+El procedimiento seguido es el siguiente:
+
+\begin{enumerate}
+    \item Enumerar todos los subconjuntos $S \subseteq E$.
+    \item Descartar aquellos subconjuntos que no contengan exactamente $n-1$ aristas.
+    \item Para cada subconjunto candidato:
+    \begin{itemize}
+        \item Verificar que el subgrafo inducido sea conexo y acíclico, utilizando
+        una estructura de datos \emph{Disjoint Set Union} (DSU).
+        \item Comprobar que el grado de cada vértice no exceda su límite máximo
+        permitido.
+        \item Calcular el costo total de las aristas seleccionadas.
+    \end{itemize}
+    \item Conservar el subconjunto válido cuyo costo total sea mínimo.
+\end{enumerate}
+
+Este algoritmo garantiza encontrar la solución óptima, aunque a costa de un
+tiempo de ejecución exponencial.
+
+\subsubsection*{Pseudocódigo}
+
+\begin{lstlisting}[language=]
+BruteForce-DCMST(G):
+    bestCost <- +infinity
+    bestTree <- empty
+
+    for each subset S of E:
+        if |S| != |V| - 1:
+            continue
+
+        initialize DSU with |V| elements
+        deg[v] <- 0 for all v in V
+        cost <- 0
+        valid <- true
+
+        for each edge (u,v) in S:
+            if deg[u] + 1 > d(u) or deg[v] + 1 > d(v):
+                valid <- false
+                break
+
+            deg[u] <- deg[u] + 1
+            deg[v] <- deg[v] + 1
+
+            if DSU.find(u) == DSU.find(v):
+                valid <- false
+                break
+
+            DSU.union(u,v)
+            cost <- cost + c(u,v)
+
+        if valid and cost < bestCost:
+            bestCost <- cost
+            bestTree <- S
+
+    return bestCost, bestTree
+\end{lstlisting}
+
+\subsubsection*{Análisis de Complejidad}
+
+Sea $n = |V|$ el número de vértices y $m = |E|$ el número de aristas del grafo.
+
+\begin{itemize}
+    \item El algoritmo enumera todos los subconjuntos posibles de aristas, lo cual
+    implica $2^m$ iteraciones.
+    \item Para cada subconjunto candidato con $n-1$ aristas, se realizan:
+    \begin{itemize}
+        \item Operaciones de unión y búsqueda en la estructura DSU, con costo
+        $O(n \alpha(n)) \approx O(n)$.
+        \item Verificación de los límites de grado y cálculo del costo total,
+        ambos en $O(n)$.
+    \end{itemize}
+\end{itemize}
+
+Por tanto, la complejidad temporal total del algoritmo es:
+
+\[
+\boxed{
+O(2^m \cdot n)
+}
+\]
+
+En el peor caso, cuando el grafo es denso y $m = O(n^2)$, la complejidad crece
+como $O(2^{n^2})$, lo cual hace que este enfoque sea impracticable para
+instancias de tamaño moderado o grande.
+
+\subsubsection*{Conclusión}
+
+El algoritmo de fuerza bruta permite obtener la solución óptima del problema de
+diseño de la red de fibra óptica bajo restricciones de grado. Sin embargo, su
+costo computacional exponencial limita su uso a instancias muy pequeñas. Esto
+justifica la necesidad de desarrollar algoritmos heurísticos o aproximados,
+los cuales se abordan en las siguientes secciones.
+
+\subsection*{Algoritmo Heurístico: Reducción del Árbol de Oportunidades}
+\addcontentsline{toc}{subsection}{Algoritmo Heurístico: Reducción del Árbol de Oportunidades}
+
+Con el objetivo de disminuir el tamaño del espacio de búsqueda y la dificultad
+computacional del problema, se introducen una serie de propiedades estructurales
+del \textbf{árbol expansivo mínimo con restricciones de grado} que permiten
+reducir el grafo original sin perder optimalidad.
+
+Sea $T^*$ un árbol expansivo mínimo con restricciones de grado del grafo
+$G = (V,E)$.
+
+\subsubsection*{Propiedades Estructurales}
+
+\paragraph{Lema 1.}
+Sea $v \in V$ un vértice hoja, es decir, un vértice con grado uno en el grafo
+original $G$. Entonces, la única arista incidente a $v$ debe pertenecer a $T^*$.
+
+\paragraph{Demostración.}
+Dado que $T^*$ es un grafo conexo que contiene todos los vértices de $G$, el vértice
+$v$ debe estar conectado al resto del árbol mediante su única arista incidente.
+Excluir dicha arista implicaría que $v$ quedaría aislado, contradiciendo la
+conectividad de $T^*$. Por tanto, toda arista incidente a un vértice colgante debe
+incluirse necesariamente en $T^*$. \hfill $\square$
+
+\vspace{0.2cm}
+
+\paragraph{Lema 2.}
+Sea $V_1 = \{ v_i \in V \mid d(v_i) = 1 \}$ el conjunto de vértices cuyo grado máximo
+permitido es uno, y sea
+\[
+E_1 = \{ (v_i,v_j) \in E \mid v_i, v_j \in V_1 \}.
+\]
+Si $|V| > 2$, entonces ninguna arista de $E_1$ puede pertenecer a $T^*$.
+
+\paragraph{Demostración.}
+Supóngase que existe una arista $(v_i,v_j) \in E_1$ incluida en $T^*$. Como
+$d(v_i)=d(v_j)=1$, ninguno de estos vértices puede conectarse con ningún otro
+vértice adicional en $T^*$. Esto implica que el subgrafo resultante no puede ser
+conexo cuando $|V|>2$, lo cual contradice la definición de árbol expansivo.
+Por tanto, todas las aristas de $E_1$ deben ser excluidas de $T^*$. \hfill $\square$
+
+\vspace{0.2cm}
+
+\paragraph{Lema 3.}
+Sea $v_k$ un vértice de grado dos en $G$, con vecinos $v_i$ y $v_j$. Si no existe
+ningún camino entre $v_i$ y $v_j$ que no pase por $v_k$, entonces las aristas
+$(v_k,v_i)$ y $(v_k,v_j)$ deben pertenecer a $T^*$.
+
+\paragraph{Demostración.}
+Supóngase que alguna de las aristas $(v_k,v_i)$ o $(v_k,v_j)$ no pertenece a $T^*$.
+Dado que no existe un camino alternativo entre $v_i$ y $v_j$ que evite el vértice
+$v_k$, se deduce que $T^*$ no puede ser conexo, lo cual contradice su definición.
+Por tanto, ambas aristas deben incluirse necesariamente en $T^*$. \hfill $\square$
+
+---
+
+\subsubsection*{Algoritmo de Reducción}
+
+A partir de las propiedades anteriores, se define un procedimiento de reducción
+que simplifica el grafo original antes de aplicar un algoritmo constructivo.
+
+\begin{lstlisting}
+Reduction_DCMST(G = (V,E), d):
+    T* <- empty
+    1. Eliminar todas las aristas que satisfacen el Lema 2.
+    2. Identificar todos los v\'ertices colgantes (grado 1),
+       agregar sus aristas incidentes a T* y eliminarlos del grafo.
+    3. Identificar v\'ertices que satisfacen el Lema 3,
+       agregar las aristas correspondientes a T* y eliminarlas del grafo.
+    return G reducido, T*
+\end{lstlisting}
+
+El costo computacional de este algoritmo de reducción es:
+
+\begin{itemize}
+    \item Paso 1: $O(n^2)$,
+    \item Paso 2: $O(n)$,
+    \item Paso 3: $O(n^3)$.
+\end{itemize}
+
+Por tanto, la complejidad temporal total del algoritmo de reducción es:
+
+\[
+O(n^3)
+\]
+
+---
+
+\subsubsection*{Construcción del Árbol con Restricciones de Grado}
+
+Una vez reducido el grafo, se construye un árbol expansivo utilizando un algoritmo
+greedy basado en el algoritmo clásico de Kruskal, adaptado para respetar las
+restricciones de grado.
+
+El algoritmo itera seleccionando aristas de menor costo que conecten componentes
+distintas y que no violen los límites de grado de los vértices involucrados. Este
+procedimiento continúa hasta obtener $|V|-1$ aristas.
+
+
+\begin{lstlisting}
+MAIN_DCMST(G = (V, E), w, d):
+    V* <- V
+    E* <- empty
+    T* <- (V*, E*)
+
+    1. Ejecutar REDUCTION_DCMST(G, d)
+    
+    2. E1 <- E
+
+    3. while |E*| < |V| - 1 do
+           seleccionar la arista de menor costo
+           emin = (vk, vh) en E1
+           
+           eliminar emin de E1
+           
+           if vk y vh estan en componentes distintas de T*
+              and deg_T*(vk) < d(vk)
+              and deg_T*(vh) < d(vh) then
+               
+               E* <- E* U {emin}
+               unir las componentes de vk y vh en T*
+           end if
+       end while
+
+    4. Aplicar tecnicas de intercambio de aristas
+       (1-opt y 2-opt) para mejorar la solucion
+
+    return G* = (V*, E*)
+\end{lstlisting}
+
+
+---
+
+\subsubsection*{Técnicas de Intercambio de Aristas}
+
+Para mejorar la solución obtenida, se emplean técnicas de \emph{edge exchange}.
+
+\paragraph{Intercambio 1-opt.}
+Consiste en eliminar una arista del árbol y reemplazarla por una arista externa,
+siempre que el resultado sea un árbol. Esta operación puede modificar los grados
+de los vértices y, por tanto, debe verificarse nuevamente la restricción de grado.
+
+\paragraph{Intercambio 2-opt.}
+Consiste en reemplazar dos aristas del árbol por dos aristas externas, de forma
+que el grado de cada vértice se conserve. Esta operación garantiza que la
+restricción de grado siga siendo satisfecha y permite mejorar el costo total del
+árbol.
+
+---
+
+\subsubsection*{Complejidad del Algoritmo Heurístico}
+
+La complejidad temporal del algoritmo completo es la siguiente:
+
+\begin{itemize}
+    \item Reducción del grafo: $O(n^3)$.
+    \item Construcción inicial del árbol (Kruskal modificado): $O(n)$.
+    \item Intercambio 1-opt: $O(n)$.
+    \item Intercambio 2-opt: $O(n^2)$.
+\end{itemize}
+
+Por tanto, la complejidad temporal total del algoritmo heurístico es:
+
+\[
+\boxed{O(n^3)}
+\]
+
+Este enfoque permite obtener soluciones de alta calidad en tiempo polinomial,
+haciendo viable el tratamiento de instancias de tamaño considerable.
+
+\newpage
+\begin{center}
+\LARGE \textbf{Implementación y Análisis Experimental}
+\end{center}
+\addcontentsline{toc}{section}{Fase 4: Implementación y Análisis Experimental}
+Las implementaciones 
 
 \end{document}
