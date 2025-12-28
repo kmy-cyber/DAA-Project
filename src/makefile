@@ -54,7 +54,7 @@ $(JUDGE): $(SRC_JUDGE) | $(BIN)
 	$(CXX) $(CXXFLAGS) $< -o $@
 	@echo "$(GREEN)✅ Judge compiled!$(RESET)"
 
-gen-tests: test_generator
+gen-tests:
 	@chmod +x generate_tests.sh
 	@echo "$(YELLOW)🧪 Generating $(CASES_TESTS) tests...$(RESET)"
 	./generate_tests.sh $(CASES_TESTS)

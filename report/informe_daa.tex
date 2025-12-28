@@ -605,6 +605,38 @@ haciendo viable el tratamiento de instancias de tamaño considerable.
 \LARGE \textbf{Implementación y Análisis Experimental}
 \end{center}
 \addcontentsline{toc}{section}{Fase 4: Implementación y Análisis Experimental}
-Las implementaciones 
+
+El \textbf{Algoritmo Heurístico: Reducción del Árbol de Oportunidades} no garantiza encontrar una solución factible incluso cuando esta existe, 
+debido a decisiones greedy irreversibles que pueden saturar restricciones de grado prematuramente. 
+Además, las técnicas de edge exchange propuestas solo son aplicables cuando ya se ha construido un 
+árbol generador, lo cual no siempre ocurre.
+
+
+Input donde falla:
+
+
+\begin{lstlisting}
+10 18
+4 7 3
+8 7 19
+3 1 19
+4 1 13
+6 5 5
+9 1 2
+3 0 9
+2 6 4
+0 2 5
+5 2 11
+8 0 11
+6 8 6
+2 7 8
+7 5 15
+3 7 17
+2 1 1
+1 5 3
+7 0 7
+1 2 2 3 3 1 3 3 3 2 
+\end{lstlisting}
+
 
 \end{document}

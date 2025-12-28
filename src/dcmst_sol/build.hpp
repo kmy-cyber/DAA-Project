@@ -207,7 +207,13 @@ void Main_DCMST(Graph& G, std::vector<Edge>& T) {
 
     // std::cout << "End T of buildDegree: " << std::endl;
 
-    oneOptExchange(G, T);
+//     oneOptExchange(G, T);
 
-    twoOptExchange(G, T);
-}
+//     twoOptExchange(G, T);
+
+
+    // comprobar que T tenga
+
+    if((int)T.size() != G.n -1) T.clear();
+    
+ }
