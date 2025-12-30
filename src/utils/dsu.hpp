@@ -29,4 +29,13 @@ struct DSU {
 
         return true;
     }
+
+    void print_dsu()
+    {
+        for(int i=0;i<(int)parent.size();i++)
+        {
+            std::cout << "Node: " << i << " Parent: " << parent[i] 
+                      << " Rank: " << rank[i] << std::endl;
+        }
+    }
 };

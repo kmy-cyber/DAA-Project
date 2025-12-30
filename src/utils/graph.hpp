@@ -2,17 +2,18 @@
 #include <vector>
 #include <algorithm>
 #include "edge.hpp"
+#include "types.hpp"
 
 struct Graph {
     int n;
 
-    std::vector<std::vector<std::pair<int, int>>> adj;  // pair<vertex, weight>
+    std::vector<vii> adj;  // pair<vertex, weight>
 
-    std::vector<int> degree;
+    vi degree;
 
-    std::vector<Edge> edges;
+    vEdges edges;
 
-    std::vector<int> b;
+    vi b;
 
     Graph(int n)
         : n(n),
@@ -45,14 +46,15 @@ struct Graph {
     }
 
     bool removeEdge(int u, int v) {
+        //std::cout<<"Removing edge: " << u << " " << v << std::endl;
         if (!hasEdge(u, v)) return false;
 
         // eliminar de adj
         adj[u].erase(std::remove_if(adj[u].begin(), adj[u].end(),
-            [v](const std::pair<int, int>& p) { return p.first == v; }),
+            [v](const ii& p) { return p.first == v; }),
             adj[u].end());
         adj[v].erase(std::remove_if(adj[v].begin(), adj[v].end(),
-            [u](const std::pair<int, int>& p) { return p.first == u; }),
+            [u](const ii& p) { return p.first == u; }),
             adj[v].end());
 
         degree[u]--;
@@ -69,4 +71,15 @@ struct Graph {
 
         return true;
     }
+
+    void printGraph() const {
+        for (int u = 0; u < n; u++) {
+            std::cout << "Node " << u << ": ";
+            for (const auto& p : adj[u]) {
+                std::cout << "(" << p.first << ", " << p.second << ") ";
+            }
+            std::cout << "\n";
+        }
+    }
+
 };
