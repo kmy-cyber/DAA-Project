@@ -8,10 +8,12 @@ BRUTE = $(BIN)/brute
 TEST    = $(BIN)/test
 JUDGE  = $(BIN)/judge
 DCMST = $(BIN)/dcmst
+LAGRANGE = $(BIN)/lagrange
 CHECKER = $(BIN)/checker
 
 SRC_BRUTE = brute_solver/main.cpp
 SRC_DCMST = dcmst_sol/dcmst.cpp
+SRC_LAGRANGE = lagrange_sol/lagrange.cpp
 SRC_TEST   = judging/test_generator.cpp
 SRC_JUDGE = judging/judge.cpp
 SRC_CHECKER = judging/checker.cpp
@@ -26,7 +28,7 @@ RESET  := \033[0m
 $(BIN):
 	mkdir -p $(BIN)
 
-all: $(BRUTE) $(DCMST) $(TEST) $(CHECKER) $(JUDGE) 
+all: $(BRUTE) $(DCMST) $(LAGRANGE) $(TEST) $(CHECKER) $(JUDGE) 
 	@echo "$(GREEN)✨ Compilation finished successfully!$(RESET)"
 
 $(BRUTE): $(SRC_BRUTE) | $(BIN)
@@ -38,6 +40,11 @@ $(DCMST): $(SRC_DCMST) | $(BIN)
 	@echo "$(BLUE)🚀 Compiling $(SRC_DCMST)...$(RESET)"
 	$(CXX) $(CXXFLAGS) $< -o $@
 	@echo "$(GREEN)✅ DCMST compiled!$(RESET)"
+
+$(LAGRANGE): $(SRC_LAGRANGE) | $(BIN)
+	@echo "$(BLUE)🚀 Compiling $(SRC_LAGRANGE)...$(RESET)"
+	$(CXX) $(CXXFLAGS) $< -o $@
+	@echo "$(GREEN)✅ Lagrange solver compiled!$(RESET)"
 
 $(TEST): $(SRC_TEST) | $(BIN)
 	@echo "$(BLUE)🚀 Compiling $(SRC_TEST)...$(RESET)"
