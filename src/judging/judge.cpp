@@ -13,7 +13,8 @@ struct Stat {
 int main() {
     vector<string> algos = {
         "bin/brute",
-        "bin/dcmst"
+        "bin/dcmst",
+        "bin/lagrange"
     };
     int ret = system("mkdir -p outputs logs");
     (void)ret; 

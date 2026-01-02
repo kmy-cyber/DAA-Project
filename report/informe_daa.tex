@@ -600,6 +600,367 @@ Por tanto, la complejidad temporal total del algoritmo heurístico es:
 Este enfoque permite obtener soluciones de alta calidad en tiempo polinomial,
 haciendo viable el tratamiento de instancias de tamaño considerable.
 
+\subsection*{Heurística Lagrangiana para DC-MST}
+\addcontentsline{toc}{subsection}{Heurística Lagrangiana para DC-MST}
+
+El enfoque de relajación Lagrangiana constituye una técnica poderosa para 
+obtener cotas inferiores de calidad y guiar la construcción de soluciones 
+factibles para problemas de optimización combinatoria NP-duros. En el contexto
+del DC-MST, se aplica esta técnica relajando las restricciones de grado 
+mediante multiplicadores Lagrangianos, lo que transforma el problema original
+en un problema de árbol generador mínimo (MST) clásico, resoluble en tiempo
+polinomial.
+
+\subsubsection*{Idea del Algoritmo}
+
+La heurística Lagrangiana propuesta se compone de tres componentes principales
+que trabajan de forma integrada:
+
+\paragraph{1. Relajación Lagrangiana del DC-MST.}
+Se relajan las restricciones de grado mediante multiplicadores Lagrangianos
+$\lambda = (\lambda_1, \lambda_2, \ldots, \lambda_n) \in \mathbb{R}_+^{|V|}$,
+donde $\lambda_i$ penaliza las violaciones de la restricción de grado en el
+vértice $i \in V$.
+
+El subproblema de relajación Lagrangiana (LRS) resultante es:
+
+\[
+z(\lambda) = \min \left\{ \sum_{e=[i,j] \in E} (c_e + \lambda_i + \lambda_j) x_e 
+- \sum_{i \in V} \lambda_i d_i : x \in R_0 \right\}
+\]
+
+donde $R_0$ representa el conjunto de vectores de incidencia de árboles 
+generadores de $G$. Este subproblema equivale a encontrar un MST con costos
+modificados $\{c_e + \lambda_i + \lambda_j : e=[i,j] \in E\}$, resoluble 
+eficientemente mediante algoritmos de Kruskal o Prim.
+
+Para obtener la mejor cota inferior posible, se resuelve el problema dual
+Lagrangiano:
+
+\[
+z(\lambda^*) = \max_{\lambda \geq 0} \left\{ z(\lambda) \right\}
+\]
+
+El vector óptimo $\lambda^*$ se obtiene mediante el \textbf{método del 
+subgradiente}, que actualiza iterativamente los multiplicadores según:
+
+\[
+\lambda_i^{k+1} = \max\left\{0, \lambda_i^k + t^k s_i^k\right\}, 
+\quad \forall i \in V
+\]
+
+donde $s_i^k = \sum_{e \in \delta(i)} x_e^k - d_i$ es el subgradiente
+(violación de la restricción de grado en el vértice $i$), y el tamaño de
+paso $t^k$ se calcula como:
+
+\[
+t^k = \frac{(1 + \alpha) z_{UB} - z(\lambda^k)}{\|s^k\|^2}
+\]
+
+siendo $z_{UB}$ una cota superior conocida y $\alpha$ un parámetro de 
+control (típicamente $\alpha = 0.03$).
+
+\paragraph{2. Construcción Heurística con Prevención de Infactibilidad.}
+Se introduce el algoritmo \texttt{KRUSKALX}, una variante del algoritmo
+clásico de Kruskal que incorpora un mecanismo de \emph{look-ahead} para
+prevenir la generación de soluciones infactibles.
+
+La idea fundamental es el concepto de \textbf{saturación}. Sea $T=(V_T, E_T)$
+un subárbol. Se definen:
+
+\begin{itemize}
+    \item \textbf{Grado del árbol:} $\delta(T) = \sum_{i \in V_T} \sum_{e \in \delta(i) \cap E_T} 1$
+    \item \textbf{Capacidad del árbol:} $d(T) = \sum_{i \in V_T} d_i$
+\end{itemize}
+
+Un árbol $T$ se considera \textbf{saturado} si $\delta(T) = d(T)$, es decir,
+si ha alcanzado su capacidad máxima de aristas respetando las restricciones
+de grado.
+
+\textbf{Proposición (Condición de No Saturación):}
+Sean $T_1$ y $T_2$ dos subárboles disjuntos no saturados. Si existe una arista
+$e \in E$ tal que $T_3 = (V_1 \cup V_2, E_1 \cup E_2 \cup \{e\})$ es también
+no saturado, entonces:
+
+\[
+\delta(T_3) = \delta(T_1) + \delta(T_2) + 2 < d(T_3)
+\]
+
+Esta propiedad garantiza que en grafos completos siempre es posible construir
+una solución factible, incluso cuando algunos vértices tienen $d_i \in \{1,2\}$.
+
+El algoritmo \texttt{KRUSKALX} ordena las aristas por costo creciente y las
+considera secuencialmente. Una arista $e=[i,j]$ se añade al árbol en
+construcción si y solo si:
+
+\begin{enumerate}
+    \item Conecta dos componentes distintas (no crea ciclos)
+    \item No viola las restricciones de grado: $\deg(i) < d_i$ y $\deg(j) < d_j$
+    \item La unión resultante no está saturada (excepto en la última arista)
+\end{enumerate}
+
+Para guiar la construcción hacia soluciones de buena calidad, se utilizan
+\textbf{costos complementarios}. Si $x^k$ es la solución del LRS en la
+iteración $k$, los costos se modifican como:
+
+\[
+\bar{c}_e = (1 - x_e^k) c_e, \quad \forall e \in E
+\]
+
+Esto hace que las aristas seleccionadas en la solución Lagrangiana sean
+más atractivas para el algoritmo constructivo.
+
+\paragraph{3. Problema Restringido.}
+Para mejorar la eficiencia computacional, se define un \textbf{problema 
+restringido} sobre un subconjunto de aristas $E' \subseteq E$. Dado el
+ordenamiento de aristas $\{e_1, e_2, \ldots, e_m\}$ usado por 
+\texttt{KRUSKALX} y siendo $k^*$ el índice de la última arista insertada,
+se define:
+
+\[
+E' = \{e_1, e_2, \ldots, e_{m^*}\}, \quad \text{donde } m^* = \min\{2k^*, m\}
+\]
+
+El grafo restringido $G' = (V, E')$ contiene típicamente una fracción pequeña
+de las aristas originales pero preserva soluciones de alta calidad. Trabajar
+sobre $G'$ reduce significativamente el tiempo de cómputo permitiendo abordar
+instancias con miles de vértices.
+
+\paragraph{4. Procedimiento de Mejora Local.}
+Una vez construida una solución factible $T$, se aplica un procedimiento de
+mejora por intercambio de aristas. Para cada arista $e \in T$:
+
+\begin{enumerate}
+    \item Se elimina $e$ de $T$, generando dos subárboles $T_1$ y $T_2$
+    \item Se busca la arista de menor costo $\bar{e} \in E \setminus T$ que 
+          reconecte $T_1$ y $T_2$ sin violar restricciones de grado
+    \item Si $c_{\bar{e}} < c_e$, se realiza el intercambio: 
+          $T \leftarrow (T \setminus \{e\}) \cup \{\bar{e}\}$
+\end{enumerate}
+
+Este procedimiento tiene complejidad $O(|V| \cdot |E|)$ y se ejecuta sobre
+el árbol obtenido en cada iteración del método del subgradiente.
+
+\subsubsection*{Pseudocódigo}
+
+\begin{lstlisting}
+KRUSKALX(G, c, d):
+    Ordenar aristas E = {e1, e2, ..., em} por costo creciente
+    Inicializar deg[i] <- 0 para todo i en V
+    Inicializar T <- (V, empty), k <- 1
+    
+    while |E(T)| < |V| - 1 and k <= m:
+        ek <- [i, j]
+        
+        if deg[i] < d[i] and deg[j] < d[j]:
+            if ek no forma ciclo en T:
+                if |E(T)| = |V| - 2:
+                    /* Ultima arista, agregar directamente */
+                    E(T) <- E(T) U {ek}
+                    deg[i] <- deg[i] + 1
+                    deg[j] <- deg[j] + 1
+                else:
+                    /* Verificar condicion de no saturacion */
+                    T1 <- componente de i en T
+                    T2 <- componente de j en T
+                    if delta(T1) + delta(T2) + 2 < d(T1) + d(T2):
+                        E(T) <- E(T) U {ek}
+                        deg[i] <- deg[i] + 1
+                        deg[j] <- deg[j] + 1
+                    end if
+                end if
+            end if
+        end if
+        k <- k + 1
+    end while
+    
+    return T, k*
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+\begin{lstlisting}
+IMPROVEMENT_PROCEDURE(T, G, c, d):
+    E0 <- E(T)
+    improved <- true
+    
+    while improved:
+        improved <- false
+        for each e = [i,j] in E0:
+            Eliminar e de T, obteniendo T1 y T2
+            
+            /* Buscar mejor arista de reconexion */
+            e_best <- null
+            cost_best <- +infinito
+            
+            for each e' = [u,v] in E \ E(T):
+                if u en V(T1) and v en V(T2) (o viceversa):
+                    if deg_T(u) < d[u] or u in {i,j}:
+                        if deg_T(v) < d[v] or v in {i,j}:
+                            if c[e'] < cost_best:
+                                e_best <- e'
+                                cost_best <- c[e']
+                            end if
+                        end if
+                    end if
+                end if
+            end for
+            
+            if e_best != null and cost_best < c[e]:
+                E(T) <- (E(T) \ {e}) U {e_best}
+                improved <- true
+            else:
+                Restaurar e en T
+            end if
+        end for
+    end while
+    
+    return T
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+\begin{lstlisting}
+LAGRANGIAN_HEURISTIC(G, c, d):
+    /* Fase 1: Inicializacion */
+    T_init <- KRUSKALX(G, c, d)
+    E' <- primeras 2*k* aristas del ordenamiento
+    G' <- (V, E')
+    
+    lambda[i] <- 0 para todo i en V
+    z_LB <- -infinito
+    z_UB <- costo(T_init)
+    T_best <- T_init
+    
+    alpha <- 2.0
+    iter <- 0
+    max_iter <- 1000
+    iter_sin_mejora <- 0
+    
+    /* Fase 2: Metodo del subgradiente */
+    while iter < max_iter and z_UB - z_LB > 0.99:
+        /* Resolver LRS con costos modificados */
+        c_mod[e=[i,j]] <- c[e] + lambda[i] + lambda[j]
+        T_LRS <- MST(G', c_mod)
+        z_lambda <- costo(T_LRS) - sum(lambda[i] * d[i])
+        
+        if z_lambda > z_LB:
+            z_LB <- z_lambda
+            iter_sin_mejora <- 0
+        else:
+            iter_sin_mejora <- iter_sin_mejora + 1
+        end if
+        
+        /* Si LRS es factible para DC-MST */
+        if deg_T_LRS[i] <= d[i] para todo i en V:
+            T_LRS <- IMPROVEMENT_PROCEDURE(T_LRS, G', c, d)
+            if costo(T_LRS) < z_UB:
+                z_UB <- costo(T_LRS)
+                T_best <- T_LRS
+            end if
+        end if
+        
+        /* Construccion heuristica con costos complementarios */
+        c_comp[e] <- (1 - x_LRS[e]) * c[e]
+        T_heur <- KRUSKALX(G', c_comp, d)
+        
+        if T_heur es factible:
+            T_heur <- IMPROVEMENT_PROCEDURE(T_heur, G', c, d)
+            if costo(T_heur) < z_UB:
+                z_UB <- costo(T_heur)
+                T_best <- T_heur
+            end if
+        end if
+        
+        /* Actualizar multiplicadores Lagrangianos */
+        s[i] <- deg_T_LRS[i] - d[i] para todo i en V
+        t <- alpha * (z_UB - z_lambda) / ||s||^2
+        
+        for i = 1 to |V|:
+            if s[i] > 0 or lambda[i] > 0:
+                lambda[i] <- max(0, lambda[i] + t * s[i])
+            end if
+        end for
+        
+        /* Ajustar parametro alpha */
+        if iter_sin_mejora > 30:
+            alpha <- alpha * 0.5
+            iter_sin_mejora <- 0
+        end if
+        
+        iter <- iter + 1
+    end while
+    
+    return T_best, z_LB, z_UB
+\end{lstlisting}
+
+\subsubsection*{Análisis de Complejidad}
+
+Sea $n = |V|$, $m = |E|$ y $m' = |E'|$ el tamaño del problema restringido.
+
+\paragraph{Complejidad de KRUSKALX:}
+\begin{itemize}
+    \item Ordenamiento de aristas: $O(m \log m)$
+    \item Construcción del árbol con verificación de saturación: $O(m \alpha(n))$
+    \item Complejidad total: $O(m \log m + m \alpha(n)) = O(m \log m)$
+\end{itemize}
+
+\paragraph{Complejidad del Procedimiento de Mejora:}
+\begin{itemize}
+    \item Para cada arista en $T$: $O(n)$ iteraciones
+    \item Búsqueda de mejor reconexión: $O(m')$
+    \item Complejidad por iteración: $O(n \cdot m')$
+    \item En el peor caso (múltiples pasadas): $O(n^2 \cdot m')$
+\end{itemize}
+
+\paragraph{Complejidad de una Iteración del Método del Subgradiente:}
+\begin{itemize}
+    \item Resolver LRS (MST): $O(m' \log m')$
+    \item Ejecutar KRUSKALX: $O(m' \log m')$
+    \item Procedimiento de mejora: $O(n^2 \cdot m')$
+    \item Actualización de multiplicadores: $O(n)$
+    \item Total por iteración: $O(n^2 \cdot m' + m' \log m')$
+\end{itemize}
+
+\paragraph{Complejidad Total del Algoritmo:}
+
+Sea $K$ el número de iteraciones del método del subgradiente (típicamente 
+$K = O(1000)$ en la práctica). La complejidad total es:
+
+\[
+\boxed{O\left(K \cdot (n^2 \cdot m' + m' \log m')\right)}
+\]
+
+Para grafos completos, $m = \Theta(n^2)$ y típicamente $m' = O(n \log n)$
+debido al problema restringido. En este caso:
+
+\[
+O(K \cdot n^3 \log n)
+\]
+
+Esta complejidad es manejable para instancias con miles de vértices, como
+demuestran los experimentos computacionales reportados en la literatura,
+donde se resuelven instancias con hasta 2000 vértices.
+
+\paragraph{Ventajas del Enfoque Lagrangiano:}
+
+\begin{enumerate}
+    \item \textbf{Cotas de calidad:} Proporciona cotas inferiores que permiten
+    evaluar la calidad de las soluciones heurísticas.
+    
+    \item \textbf{Guiado inteligente:} La información dual guía la construcción
+    de soluciones factibles hacia regiones prometedoras del espacio de búsqueda.
+    
+    \item \textbf{Prueba de optimalidad:} Cuando $z_{UB} - z_{LB} < 1$ (para
+    costos enteros), se certifica que la solución es óptima.
+    
+    \item \textbf{Escalabilidad:} El problema restringido permite trabajar con
+    grafos grandes manteniendo la calidad de las soluciones.
+    
+    \item \textbf{Robustez:} Garantiza encontrar soluciones factibles en grafos
+    completos, incluso con restricciones de grado muy ajustadas ($d_i \in \{1,2\}$).
+\end{enumerate}
+
 \newpage
 \begin{center}
 \LARGE \textbf{Implementación y Análisis Experimental}
