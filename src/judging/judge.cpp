@@ -1,14 +1,102 @@
+// #include <bits/stdc++.h>
+// #include <filesystem>
+// using namespace std;
+// namespace fs = std::filesystem;
+
+// struct Stat {
+//     string test;
+//     string status;
+//     double time_ms;
+//     int memory; 
+// };
+
+// int main() {
+//     vector<string> algos = {
+//         "bin/brute",
+//         "bin/dcmst",
+//         "bin/lagrange"
+//     };
+//     int ret = system("mkdir -p outputs logs");
+//     (void)ret; 
+
+//     vector<fs::path> tests;
+//     for (const auto &e : fs::directory_iterator("tests"))
+//         if (e.path().extension() == ".in")
+//             tests.push_back(e.path());
+//     sort(tests.begin(), tests.end());
+
+//     for (auto &alg : algos) {
+//         string name = fs::path(alg).filename().string();
+//         cout << "== Running " << name << " ==\n";
+
+//         ofstream log_file("logs/" + name + ".csv");
+//         log_file << "Test,Status,Time(ms),Memory(KB)\n";
+
+//         for (auto &test_path : tests) {
+//             string base = test_path.stem().string();
+//             string out = "outputs/" + name + "_" + base + ".out";
+//             string tmp = "outputs/tmp_time.txt";
+
+//             string cmd = "/usr/bin/time -f \"%M %e\" " +
+//                          alg + " " + test_path.string() + " " + out +
+//                          " 2> " + tmp;
+
+//             int ret = system(cmd.c_str());
+
+//             string status;
+//             if (ret != 0) {
+//                 status = "RE";
+//             } else {
+//                 ret = system(("bin/checker " + test_path.string() + " " + out +
+//                               " > /dev/null 2>&1").c_str());
+//                 status = (ret == 0 ? "OK" : "WA");
+//             }
+
+//             int mem = 0;
+//             double t_sec = 0;
+//             ifstream f(tmp);
+//             if (!(f >> mem >> t_sec)) {
+//                 mem = 0;
+//                 t_sec = 0;
+//             }
+
+//             double t_ms = t_sec * 1000.0;
+
+//             log_file << base << "," << status << ","
+//                      << fixed << setprecision(3)
+//                      << t_ms << "," << mem << "\n";
+//         }
+
+//         log_file.close();
+//     }
+// }
+
+
+
+
 #include <bits/stdc++.h>
 #include <filesystem>
 using namespace std;
 namespace fs = std::filesystem;
 
-struct Stat {
-    string test;
-    string status;
-    double time_ms;
-    int memory; 
+static constexpr double TIME_LIMIT_SEC = 5.0;
+static constexpr int MEMORY_LIMIT_KB = 512 * 1024;
+
+struct AlgoStats {
+    int ok = 0;        // 👌 óptimo
+    int bad = 0;       // 👎 subóptimo
+    int wa = 0;        // 💥 checker fail
+    int tle = 0;       // ⏰ time
+    int mle = 0;       // 🧠 memory
 };
+
+bool read_cost(const string &file, double &cost) {
+    ifstream f(file);
+    if (!f.is_open()) return false;
+    f >> cost;
+    return !f.fail();
+}
+
 
 int main() {
     vector<string> algos = {
@@ -16,8 +104,8 @@ int main() {
         "bin/dcmst",
         "bin/lagrange"
     };
-    int ret = system("mkdir -p outputs logs");
-    (void)ret; 
+
+    system("mkdir -p outputs logs");
 
     vector<fs::path> tests;
     for (const auto &e : fs::directory_iterator("tests"))
@@ -25,12 +113,14 @@ int main() {
             tests.push_back(e.path());
     sort(tests.begin(), tests.end());
 
+    map<string, AlgoStats> summary;
+
     for (auto &alg : algos) {
         string name = fs::path(alg).filename().string();
         cout << "== Running " << name << " ==\n";
 
         ofstream log_file("logs/" + name + ".csv");
-        log_file << "Test,Status,Time(ms),Memory(KB)\n";
+        log_file << "Test,Status,Time(ms),Memory(KB),Cost\n";
 
         for (auto &test_path : tests) {
             string base = test_path.stem().string();
@@ -41,32 +131,99 @@ int main() {
                          alg + " " + test_path.string() + " " + out +
                          " 2> " + tmp;
 
-            int ret = system(cmd.c_str());
+            // int ret = system(cmd.c_str());
 
-            string status;
-            if (ret != 0) {
-                status = "RE";
-            } else {
-                ret = system(("bin/checker " + test_path.string() + " " + out +
-                              " > /dev/null 2>&1").c_str());
-                status = (ret == 0 ? "OK" : "WA");
-            }
+            auto start = chrono::high_resolution_clock::now();
+            int ret = system(cmd.c_str());
+            auto end = chrono::high_resolution_clock::now();
+
+            double t_ms = chrono::duration<double, milli>(end - start).count();
 
             int mem = 0;
-            double t_sec = 0;
-            ifstream f(tmp);
-            if (!(f >> mem >> t_sec)) {
-                mem = 0;
-                t_sec = 0;
+            //double t_sec = 0;
+            ifstream mf(tmp);
+            mf >> mem;
+
+            bool tle = (t_ms > TIME_LIMIT_SEC * 1000.0);
+            bool mle = (mem > MEMORY_LIMIT_KB);
+
+            if (tle) summary[name].tle++;
+            if (mle) summary[name].mle++;
+
+            if (ret != 0) {
+                summary[name].wa++;
+                log_file << base << ",RE," << t_ms << "," << mem << ",-\n";
+                continue;
             }
 
-            double t_ms = t_sec * 1000.0;
+            ret = system(("bin/checker " + test_path.string() + " " + out +
+                          " > /dev/null 2>&1").c_str());
 
-            log_file << base << "," << status << ","
-                     << fixed << setprecision(3)
-                     << t_ms << "," << mem << "\n";
+            if (ret != 0) {
+                summary[name].wa++;
+                log_file << base << ",WA," << t_ms << "," << mem << ",-\n";
+                continue;
+            }
+
+            double cost;
+            if (!read_cost(out, cost)) {
+                summary[name].wa++;
+                continue;
+            }
+
+            log_file << base << ",OK," << fixed << setprecision(3)
+                     << t_ms << "," << mem << "," << cost << "\n";
         }
-
         log_file.close();
     }
+
+    /* ========= COMPARACIÓN DE COSTOS ========= */
+    for (auto &test_path : tests) {
+        string base = test_path.stem().string();
+
+        double best = numeric_limits<double>::infinity();
+        map<string, double> cost;
+
+        for (auto &alg : algos) {
+            string name = fs::path(alg).filename().string();
+            string out = "outputs/" + name + "_" + base + ".out";
+            double c;
+            if (read_cost(out, c)) {
+                cost[name] = c;
+                best = min(best, c);
+            }
+        }
+
+        for (auto &[name, c] : cost) {
+            if (fabs(c - best) < 1e-9)
+                summary[name].ok++;
+            else
+                summary[name].bad++;
+        }
+    }
+
+    /* ========= OUTPUT FINAL ========= */
+    ofstream md("output.md");
+
+    md << "| Algorithm | Result | 👌 | 👎 | 💥 | ⏰ | 🧠 |\n";
+    md << "|----------|--------|----|----|----|----|----|\n";
+
+    for (auto &alg : algos) {
+        string name = fs::path(alg).filename().string();
+        auto &s = summary[name];
+
+        bool pass = (s.wa == 0 && s.tle == 0 && s.mle == 0);
+        md << "| " << name
+           << " | " << (pass ? "✅" : "❌")
+           << " | " << s.ok
+           << " | " << s.bad
+           << " | " << s.wa
+           << " | " << s.tle
+           << " | " << s.mle
+           << " |\n";
+    }
+
+    md.close();
+
+    cout << "Resumen generado en output.md\n";
 }

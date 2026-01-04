@@ -78,5 +78,5 @@ one: all
 
 clean:
 	@echo "$(RED)🧹 Cleaning up...$(RESET)"
-	rm -rf bin outputs logs 
+	rm -rf bin outputs logs output.md
 	@echo "$(RED)🗑️ Cleanup complete.$(RESET)"
