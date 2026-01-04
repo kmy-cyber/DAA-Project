@@ -2,9 +2,6 @@
 #include "../utils/types.hpp"
 #include "../utils/edge.hpp"
 
-/* ========================================
-   Estructura para el árbol generador
-   ======================================== */
 struct SpanningTree {
     vEdges edges;
     vi degree;
@@ -45,3 +42,77 @@ struct SpanningTree {
         return true;
     }
 };
+
+
+
+/* ========================================
+   MST clásico (Kruskal)
+   ======================================== */
+SpanningTree classicMST(const Graph& G, const std::vector<double>& costs) {
+    SpanningTree tree(G.n);
+    
+    std::vector<std::pair<double, int>> sorted_edges;
+    for (int i = 0; i < (int)G.edges.size(); i++) {
+        sorted_edges.push_back({costs[i], i});
+    }
+    std::sort(sorted_edges.begin(), sorted_edges.end());
+
+    DSU dsu(G.n);
+
+    for (const auto& p : sorted_edges) {
+        int idx = p.second;
+        const Edge& e = G.edges[idx];
+
+        if (dsu.find(e.u) != dsu.find(e.v)) {
+            tree.addEdge(e);
+            dsu.merge(e.u, e.v);
+            
+            if ((int)tree.edges.size() == G.n - 1) {
+                break;
+            }
+        }
+    }
+
+    return tree;
+}
+
+
+
+
+
+/* ========================================
+   Construcción greedy simple como fallback
+   ======================================== */
+SpanningTree simpleGreedy(const Graph& G, const std::vector<double>* custom_costs = nullptr) {
+    SpanningTree tree(G.n);
+    
+    std::vector<std::pair<double, int>> sorted_edges;
+    for (int i = 0; i < (int)G.edges.size(); i++) {
+        double cost = custom_costs ? (*custom_costs)[i] : G.edges[i].w;
+        sorted_edges.push_back({cost, i});
+    }
+    std::sort(sorted_edges.begin(), sorted_edges.end());
+
+    DSU dsu(G.n);
+    vi deg(G.n, 0);
+
+    for (const auto& p : sorted_edges) {
+        int idx = p.second;
+        const Edge& e = G.edges[idx];
+
+        if (dsu.find(e.u) == dsu.find(e.v)) continue;
+        if (deg[e.u] >= G.b[e.u]) continue;
+        if (deg[e.v] >= G.b[e.v]) continue;
+
+        tree.addEdge(e);
+        deg[e.u]++;
+        deg[e.v]++;
+        dsu.merge(e.u, e.v);
+
+        if ((int)tree.edges.size() == G.n - 1) {
+            break;
+        }
+    }
+
+    return tree;
+}
