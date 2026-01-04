@@ -20,6 +20,7 @@ int main(int argc, char** argv) {
         while(v==u || adj[u][v]!=0) v = rng()%n;
 
         adj[u][v]=1;
+        adj[v][u]=1;
 
         int w = 1 + rng()%20;
         edges.emplace_back(u,v,w);

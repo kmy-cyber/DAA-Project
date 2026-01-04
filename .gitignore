@@ -100,3 +100,8 @@ src/logs
 
 
 article
+
+
+experiments/experimental
+experiments/test_generator
+experiments/test.in
