@@ -84,15 +84,15 @@ void Main_DCMST(Graph& G,vEdges& T) {
 
     // std::cout << "Build Degree T: " << std::endl;
 
-    for(const auto& v : T)
-    {
-        std::cout << v.u << " " << v.v << std::endl;
-    }
+    // for(const auto& v : T)
+    // {
+    //     std::cout << v.u << " " << v.v << std::endl;
+    // }
 
-    std::cout << "End T of buildDegree: " << std::endl;
+    // std::cout << "End T of buildDegree: " << std::endl;
 
 
-    G.printGraph();
+    // G.printGraph();
 
 
     // comprobar que T sea un arbol
@@ -126,7 +126,7 @@ void Main_DCMST(Graph& G,vEdges& T) {
 
     oneOptExchange(G, T);
 
-    G.printGraph();
+   // G.printGraph();
 
     // twoOptExchange(G, T);
 

@@ -1,56 +1,3 @@
-// #include <bits/stdc++.h>
-// using namespace std;
-
-// static constexpr double TIME_LIMIT_MS = 5000.0;
-
-// int main() {
-//     (void)system("mkdir -p experiments results");
-
-//     ofstream csv("results/bruteforce_scalability.csv");
-//     csv << "n,time_ms,status\n";
-
-//     vector<int> Ns = {5, 10, 15, 20, 25, 30};
-
-//     for (int n : Ns) {
-//         string test = "experiments/test.in";
-
-//         // Generar instancia
-//         string gen_cmd = "./experiments/test_generator " + to_string(n) + " > " + test;
-//         if (system(gen_cmd.c_str()) != 0) {
-//             cerr << "Error generating test for n=" << n << "\n";
-//             break;
-//         }
-
-//         // Ejecutar brute force
-//         auto start = chrono::high_resolution_clock::now();
-//         int ret = system(("./src/bin/brute " + test + " > /dev/null").c_str());
-//         auto end = chrono::high_resolution_clock::now();
-
-//         double t_ms = chrono::duration<double, milli>(end - start).count();
-
-//         string status;
-//         if (ret != 0)
-//             status = "RE";
-//         else if (t_ms > TIME_LIMIT_MS)
-//             status = "TLE";
-//         else
-//             status = "OK";
-
-//         csv << n << "," << fixed << setprecision(3)
-//             << t_ms << "," << status << "\n";
-
-//         cout << "n=" << n << " → " << t_ms << " ms (" << status << ")\n";
-
-//         if (t_ms > TIME_LIMIT_MS)
-//             break;
-//     }
-
-//     csv.close();
-// }
-
-
-
-
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -77,7 +24,7 @@ int main() {
     };
 
     for (const auto& alg : algorithms) {
-        string csv_name = "results/" + alg.name + "_scalability.csv";
+        string csv_name = "results/scalability/" + alg.name + "_scalability.csv";
         ofstream csv(csv_name);
         csv << "n,time_ms,status\n";
 

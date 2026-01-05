@@ -197,7 +197,8 @@ sujeto a las restricciones anteriores.
 
 En esta fase se determina la dificultad computacional del problema formalizado en la Fase~1.
 Demostraremos que la versión de decisión del problema es NP-completa, y por lo tanto, 
-la versión de optimización es NP-dura.
+la versión de optimización es NP-dura. Este problema es conocido en la literatura como $DC-MST$, el cual
+demostremos que la versi\'on de decisi\'on es NP-completa por lo que a versi\'on de optimizaci\'on lo es tambi\'en.
 
 \subsection*{Versión de Decisión del Problema}
 
@@ -272,23 +273,17 @@ entonces $T$ es un árbol con $|V|-1$ aristas y $\deg_{G_T}(v) \le 2$ para todo 
 La única estructura de árbol donde todos los grados son a lo sumo $2$ es un camino.  
 Por lo tanto, $T$ es un camino hamiltoniano del grafo original.
 
-\subsubsection*{Conclusión}
 
-La existencia de un $T$ válido para \textsc{DC-MST-Decision} es equivalente 
-a la existencia de un camino hamiltoniano en $G$.  
-Dado que la reducción es polinomial y \textsc{Hamiltonian Path} es NP-completo, se concluye:
-
+Esto permite entonces reducir que:
 \[
 \textsc{DC-MST-Decision} \text{ es NP-completo}.
 \]
-
-\subsection*{Consecuencia}
 
 Dado que la versión de decisión es NP-completa, la versión de optimización 
 (\textit{Degree-Constrained Minimum Spanning Tree}) es NP-dura:
 
 \[
-\text{DC-MST es NP-dura}.
+\text{DC-MST-OPT es NP-dura}.
 \]
 
 Esto implica que no se conoce un algoritmo polinomial que resuelva el problema de forma
@@ -300,7 +295,7 @@ Esto implica que no se conoce un algoritmo polinomial que resuelva el problema d
 \end{center}
 \addcontentsline{toc}{section}{Fase 3: Diseño de Soluciones Algorítmicas}
 
-El problema de construir un árbol expansivo con restricciones de grado
+El problema de construir un árbol generador con restricciones de grado
 (DC-MST) es NP-difícil, lo que implica que no existe un algoritmo
 polinomial conocido capaz de garantizar la solución óptima para
 instancias generales. Por ello, en esta sección se exploran distintas
@@ -320,19 +315,19 @@ Esto permitirá evaluar las ventajas y limitaciones de cada enfoque,
 y proporcionará una base sólida para la implementación experimental
 y la comparación de resultados en la Fase 4.
 
-\subsection*{Algoritmo de Fuerza Bruta: Exploración Exhaustiva del Espacio de Árboles Expansivos}
-\addcontentsline{toc}{subsection}{Algoritmo de Fuerza Bruta: Exploración Exhaustiva del Espacio de Árboles Expansivos}
+\subsection*{Algoritmo de Fuerza Bruta: Exploración Exhaustiva del Espacio de Árboles Generadores}
+\addcontentsline{toc}{subsection}{Algoritmo de Fuerza Bruta: Exploración Exhaustiva del Espacio de Árboles gGeneradores}
 
-Dado que el problema de encontrar un árbol expansivo de costo mínimo con
+Dado que el problema de encontrar un árbol generador de costo mínimo con
 restricciones de grado es NP-difícil, una primera aproximación consiste en
 analizar exhaustivamente todas las posibles soluciones y seleccionar aquella
 que cumple las restricciones y minimiza el costo total.
 
-Un candidato a solución válida debe ser un \textbf{árbol expansivo}, es decir,
+Un candidato a solución válida debe ser un \textbf{árbol generador}, es decir,
 un subgrafo conexo y acíclico que contiene todos los vértices del grafo y
 exactamente $|V|-1$ aristas. El algoritmo de fuerza bruta consiste en enumerar
 todos los subconjuntos de aristas del grafo y verificar cuáles de ellos cumplen
-las condiciones necesarias para ser un árbol expansivo factible.
+las condiciones necesarias para ser un árbol generador factible.
 
 \subsubsection*{Idea del Algoritmo}
 
@@ -435,10 +430,10 @@ los cuales se abordan en las siguientes secciones.
 
 Con el objetivo de disminuir el tamaño del espacio de búsqueda y la dificultad
 computacional del problema, se introducen una serie de propiedades estructurales
-del \textbf{árbol expansivo mínimo con restricciones de grado} que permiten
+del \textbf{árbol generador de costo mínimo con restricciones de grado} que permiten
 reducir el grafo original sin perder optimalidad.
 
-Sea $T^*$ un árbol expansivo mínimo con restricciones de grado del grafo
+Sea $T^*$ un árbol generador de costo mínimo con restricciones de grado del grafo
 $G = (V,E)$.
 
 \subsubsection*{Propiedades Estructurales}
@@ -468,7 +463,7 @@ Si $|V| > 2$, entonces ninguna arista de $E_1$ puede pertenecer a $T^*$.
 Supóngase que existe una arista $(v_i,v_j) \in E_1$ incluida en $T^*$. Como
 $d(v_i)=d(v_j)=1$, ninguno de estos vértices puede conectarse con ningún otro
 vértice adicional en $T^*$. Esto implica que el subgrafo resultante no puede ser
-conexo cuando $|V|>2$, lo cual contradice la definición de árbol expansivo.
+conexo cuando $|V|>2$, lo cual contradice la definición de árbol generador.
 Por tanto, todas las aristas de $E_1$ deben ser excluidas de $T^*$. \hfill $\square$
 
 \vspace{0.2cm}
@@ -520,7 +515,7 @@ O(n^3)
 
 \subsubsection*{Construcción del Árbol con Restricciones de Grado}
 
-Una vez reducido el grafo, se construye un árbol expansivo utilizando un algoritmo
+Una vez reducido el grafo, se construye un árbol generador utilizando un algoritmo
 greedy basado en el algoritmo clásico de Kruskal, adaptado para respetar las
 restricciones de grado.
 
@@ -608,7 +603,7 @@ obtener cotas inferiores de calidad y guiar la construcción de soluciones
 factibles para problemas de optimización combinatoria NP-duros. En el contexto
 del DC-MST, se aplica esta técnica relajando las restricciones de grado 
 mediante multiplicadores Lagrangianos, lo que transforma el problema original
-en un problema de árbol generador mínimo (MST) clásico, resoluble en tiempo
+en un problema de árbol generador de costo mínimo (MST) clásico, resoluble en tiempo
 polinomial.
 
 \subsubsection*{Idea del Algoritmo}
@@ -979,15 +974,81 @@ Los experimentos se realizaron bajo las siguientes condiciones:
 \begin{itemize}
     \item \textbf{Lenguaje:} C++ (estándar C++11)
     \item \textbf{Compilador:} g++ con optimizaciones -O2
-    \item \textbf{Estructura de datos:} Disjoint Set Union (DSU) con path compression
-    \item \textbf{Generación de instancias:} Grafos completos aleatorios con:
+    \item \textbf{Estructura de datos:} 
     \begin{itemize}
-        \item Costos de aristas: enteros aleatorios en el rango [1, 100]
-        \item Restricciones de grado: aleatorias respetando $d(v) \geq 1$ y $\sum d(v) \geq 2(n-1)$
+        \item Disjoint Set Union (DSU) con path compression y union by rank
+        \item Listas de adyacencia para representación de grafos
+    \end{itemize}     
+    \item \textbf{Límites por instancia:} 
+    \begin{itemize}
+        \item Tiempo de ejecución: 5 segundos (5000 ms)
+        \item Memoria: 512 MB
     \end{itemize}
-    \item \textbf{Timeout:} 5 segundos (5000 ms) por instancia
-    \item \textbf{Métricas evaluadas:} Tiempo de ejecución, calidad de solución, escalabilidad
+    \item \textbf{Métricas evaluadas:} Tiempo de ejecución, calidad de solución, escalabilidad y consumo de memoria.
+    \item \textbf{Estados posibles de una instancia:} 
+    \begin{itemize}
+        \item \textbf{OK:}solución óptima o mejor conocida
+        \item \textbf{BAD:} solución subóptima
+        \item \textbf{WA:} fallo en el checker (resultado incorrecto)
+        \item \textbf{TLE:} tiempo excedido
+        \item \textbf{MLE:} memoria excedida
+    \end{itemize}
 \end{itemize}
+
+\subsection*{Diseño y generación de instancias de prueba}
+\addcontentsline{toc}{subsection}{Diseño y generación de instancias de prueba}
+
+Para evaluar de manera rigurosa los algoritmos y heurísticas desarrolladas para el problema 
+\emph{Degree-Constrained Minimum Spanning Tree (DCMST)}, se diseñó un generador de instancias 
+de prueba que permite crear conjuntos de grafos controlados y reproducibles. 
+
+El generador de instancias sigue las siguientes características principales:
+
+\begin{itemize}
+    \item \textbf{Grafos aleatorios controlados}: el número de nodos y aristas se determina de manera aleatoria dentro de rangos predefinidos, asegurando que cada instancia sea un grafo conexo y válido para el problema.
+    \item \textbf{Asignación de pesos aleatorios mediante Mersenne Twister}: los pesos de las aristas se generan de forma pseudoaleatoria utilizando el generador Mersenne Twister (\texttt{std::mt19937}), lo que permite reproducibilidad y control sobre el rango de valores.
+    \item \textbf{Distribución de grados de nodos}: para cada nodo, se asigna un grado aleatorio dentro de un rango determinado, simulando distintos niveles de conectividad y heterogeneidad en el grafo.
+\end{itemize}
+
+Este enfoque ofrece varias ventajas:
+
+\begin{enumerate}
+    \item \textbf{Reproducibilidad}: al fijar la semilla del generador de números aleatorios, las instancias pueden regenerarse exactamente, facilitando comparaciones entre algoritmos.
+    \item \textbf{Diversidad de casos de prueba}: el generador permite variar el número de nodos, la cantidad de aristas y el rango de pesos, cubriendo un amplio espectro de escenarios posibles.
+    \item \textbf{Control sobre propiedades críticas}: se pueden definir casos específicos que maximicen la dificultad del problema, como grafos densos con pesos heterogéneos, evaluando la eficacia de las heurísticas en situaciones extremas.
+    \item \textbf{Simplicidad y eficiencia}: al usar un solo modelo de grafo aleatorio con Mersenne Twister, se reduce la complejidad de implementación y se garantiza rapidez en la generación de instancias grandes.
+\end{enumerate}
+
+De este modo, el conjunto de instancias generado combina \emph{casos aleatorios representativos} con 
+\emph{casos de estrés diseñados}, asegurando una evaluación robusta y completa de los algoritmos de DCMST.
+
+\subsection*{Descripción del proceso del juez automático}
+\addcontentsline{toc}{subsection}{Descripción del proceso del juez automático}
+El sistema realiza los siguientes pasos:
+
+\begin{enumerate}
+    \item Recolecta todas las instancias de prueba en la carpeta \texttt{tests/}.
+    \item Ejecuta cada algoritmo sobre cada instancia, midiendo:
+    \begin{itemize}
+        \item Tiempo real de ejecución con \texttt{/usr/bin/time}
+        \item Memoria máxima usada
+        \item Costo de la solución generada
+    \end{itemize}
+    \item Verifica la corrección de la solución usando un \emph{checker} externo.
+    \item Clasifica el resultado de cada ejecución en uno de los estados mencionados.
+    \item Guarda los resultados intermedios y finales en el repositorio de la siguiente manera:
+    \begin{itemize}
+        \item Las soluciones generadas por cada algoritmo se almacenan en la carpeta \texttt{outputs/}, 
+              con un archivo por algoritmo e instancia: \texttt{outputs/<algoritmo>\_<instancia>.out}.
+        \item Los registros de ejecución, incluyendo tiempo, memoria y estado de la solución, se guardan 
+        en \texttt{logs/}, un archivo CSV por algoritmo: \texttt{logs/<algoritmo>.csv}.
+        \item Finalmente, se genera un resumen global en formato Markdown llamado \texttt{output.md}, que 
+        resume para cada algoritmo el número de ejecuciones óptimas, subóptimas, errores de checker, 
+        tiempos excedidos y límites de memoria alcanzados.
+    \end{itemize}
+\end{enumerate}
+
+Este sistema permite automatizar la evaluación de múltiples algoritmos y variantes heurísticas, controlando tanto el tiempo como la memoria utilizada, y asegurando que las soluciones sean correctas antes de ser consideradas óptimas o subóptimas
 
 \subsection*{Tamaño Máximo de Instancia para Fuerza Bruta}
 \addcontentsline{toc}{subsection}{Tamaño Máximo de Instancia para Fuerza Bruta}
@@ -1122,6 +1183,45 @@ El comportamiento de Lagrange es más errático debido a la naturaleza iterativa
 método del subgradiente, cuya convergencia depende de las características específicas
 de cada instancia.
 
+\subsection*{Evaluación de Calidad de Soluciones}
+\addcontentsline{toc}{subsection}{Evaluación de Calidad de Soluciones}
+
+Para complementar el análisis de escalabilidad y tiempos de ejecución, se evaluó la \textbf{calidad de las soluciones} obtenidas por los tres algoritmos implementados sobre un conjunto representativo de instancias de prueba.  
+Se registraron los siguientes indicadores:
+
+\begin{itemize}
+    \item \textbf{[OK] Correctas:} soluciones óptimas encontradas.
+    \item \textbf{[FAIL] Incorrectas:} soluciones no óptimas.
+    \item \textbf{[ERROR] Errores fatales:} fallos durante la ejecución.
+    \item \textbf{[TIMEOUT] Timeout:} no se completó la ejecución dentro del límite de tiempo.
+    \item \textbf{[MEMORY] Memory:}  no se completó la ejecución dentro del límite de memoria.
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Result} & \textbf{[OK]} & \textbf{[FAIL]} & \textbf{[ERROR]} & \textbf{[TIMEOUT]} & \textbf{[MEMORY]} \\
+\hline
+Brute Force & [OK] & 100 & 0 & 0 & 0 & 0 \\
+DCMST & [FAIL] & 95 & 5 & 0 & 0 & 0 \\
+Lagrange & [OK] & 100 & 0 & 0 & 0 & 0 \\
+\hline
+\end{tabular}
+\caption{Calidad de soluciones de los algoritmos implementados}
+\label{tab:calidad_soluciones}
+\end{table}
+
+\paragraph{Interpretación:}  
+\begin{itemize}
+    \item El algoritmo \textbf{Brute Force} obtiene la solución óptima en todas las instancias evaluadas dentro del límite de tamaño considerado ($n \leq 15$), como era de esperar dada su naturaleza exhaustiva y el control sobre el tamaño de las instancias. Cabe destacar que, para grafos más grandes, la complejidad exponencial hace inviable su aplicación.  
+    \item La heurística \textbf{DCMST} encuentra soluciones óptimas en un 95\% de los casos; en el 5\% restante, las restricciones de grado generan soluciones subóptimas o inviables, reflejando la naturaleza greedy de la aproximación.  
+    \item El método \textbf{Lagrange} alcanza el 100\% de efectividad en las instancias evaluadas, demostrando su robustez al manejar restricciones y su capacidad de aproximación cercana al óptimo.
+\end{itemize}
+
+\paragraph{Conclusión:}  
+Estos resultados muestran que, aunque DCMST es altamente eficiente en términos de escalabilidad y tiempo, puede fallar en un pequeño porcentaje de instancias. Por lo tanto, para garantizar factibilidad y óptimo en aplicaciones críticas, es recomendable combinar DCMST como primera aproximación con Lagrange para refinamiento de la solución.
+
 \subsection*{Análisis de Comportamiento de las Heurísticas}
 \addcontentsline{toc}{subsection}{Análisis de Comportamiento de las Heurísticas}
 
@@ -1140,6 +1240,11 @@ Basándose en su estrategia greedy, el algoritmo DCMST debería desempeñarse me
     similares ($d(v) \approx \bar{d}$ para todo $v$), el algoritmo greedy no enfrenta
     saturaciones prematuras y puede seleccionar libremente las aristas más baratas.
 
+    \item \textbf{Restricciones de grado relativamente altas:} Mientras mayores sean los valores
+    de $d(v)$ y más alejados de 1, 2 o 3, el algoritmo tiene mayor libertad para seleccionar 
+    aristas, reduciendo el riesgo de bloqueos prematuros y aumentando la probabilidad de encontrar 
+    soluciones óptimas.
+
     \item \textbf{Costos bien distribuidos:} Si los costos siguen una distribución
     aproximadamente uniforme o normal, las aristas baratas no se concentran en
     vértices específicos, permitiendo al greedy construir soluciones balanceadas.
@@ -1147,10 +1252,6 @@ Basándose en su estrategia greedy, el algoritmo DCMST debería desempeñarse me
     \item \textbf{Grafos densos con alta conectividad:} En grafos completos o casi
     completos, existen múltiples alternativas de conexión, lo que reduce el impacto
     de decisiones greedy subóptimas.
-
-    \item \textbf{Instancias pequeñas ($n < 20$):} Para grafos pequeños, el espacio
-    de soluciones es reducido y el greedy explora implícitamente una fracción
-    significativa de él.
 \end{enumerate}
 
 \paragraph{Algoritmo Lagrangiano - Casos Favorables:}
@@ -1193,7 +1294,7 @@ El algoritmo Lagrangiano encuentra el óptimo o soluciones muy cercanas cuando:
     decisiones irreversibles que impiden completar el árbol.
 
     \item \textbf{Dependencias de orden:} Cuando el orden óptimo de adición de aristas
-    requiere añadir temporalmente aristas más caras para "reservar capacidad" en
+    requiere añadir temporalmente aristas más caras para reservar capacidad en
     vértices críticos, el greedy por costo creciente falla.
 \end{enumerate}
 
@@ -1245,7 +1346,7 @@ solución factible, a pesar de que existe:
 
 En esta instancia:
 \begin{itemize}
-    \item Varios vértices tienen restricciones muy ajustadas: $d \in \{1, 2\}$
+    \item Varios vértices tienen restricciones muy ajustadas: $d \in \{1, 2, 3\}$
     \item El algoritmo greedy selecciona aristas baratas (9-1: 2, 2-1: 1, 1-5: 3)
           que saturan prematuramente los vértices 1 y 2
     \item Al intentar conectar las componentes restantes, descubre que los únicos
@@ -1298,8 +1399,16 @@ Basándose en el análisis experimental:
     \item \textbf{Instancias grandes ($n > 500$):} Usar \textbf{DCMST} para maximizar
     escalabilidad. Si falla, recurrir a Lagrange o implementar backtracking en el greedy.
 
+    \item \textbf{Instancias con restricciones heterogéneas extremas:} Preferir
+    \textbf{DCMST} si las restricciones de grado conocemos que suelen ser heterogéneas, 
+    puedes existir algunas con $d(v)=2$ y otras con $d(v) \gg n/2$.
+
+    \item \textbf{Grafos densos:} Preferir \textbf{Lagrange} para aprovechar la garantía de factibilidad y preferir
+    \textbf{DCMST} donde se requiere mayor velocidad.
+
     \item \textbf{Aplicaciones de producción:} Combinar DCMST como primera aproximación
     rápida, seguido de Lagrange para refinamiento si se requiere mayor calidad.
+
 \end{itemize}
 \end{document}
 

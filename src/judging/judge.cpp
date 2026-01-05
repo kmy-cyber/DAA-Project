@@ -39,6 +39,8 @@ int main() {
 
     map<string, AlgoStats> summary;
 
+    map<string, map<string, bool>> valid;
+
     for (auto &alg : algos) {
         string name = fs::path(alg).filename().string();
         cout << "== Running " << name << " ==\n";
@@ -73,6 +75,7 @@ int main() {
 
             if (ret != 0) {
                 summary[name].wa++;
+                valid[base][name] = false;
                 log_file << base << ",RE," << t_ms << "," << mem << ",-\n";
                 continue;
             }
@@ -82,6 +85,7 @@ int main() {
 
             if (ret != 0) {
                 summary[name].wa++;
+                valid[base][name] = false;
                 log_file << base << ",WA," << t_ms << "," << mem << ",-\n";
                 continue;
             }
@@ -89,9 +93,11 @@ int main() {
             double cost;
             if (!read_cost(out, cost)) {
                 summary[name].wa++;
+                valid[base][name] = false;
                 continue;
             }
 
+            valid[base][name] = true;
             log_file << base << ",OK," << fixed << setprecision(3)
                      << t_ms << "," << mem << "," << cost << "\n";
         }
@@ -107,6 +113,8 @@ int main() {
 
         for (auto &alg : algos) {
             string name = fs::path(alg).filename().string();
+            if (!valid[base][name]) continue;
+
             string out = "outputs/" + name + "_" + base + ".out";
             double c;
             if (read_cost(out, c)) {
@@ -150,7 +158,7 @@ int main() {
         string name = fs::path(alg).filename().string();
         auto &s = summary[name];
 
-        s.bad -= s.wa;
+        // s.bad -= s.wa;
 
         bool pass = (s.bad == 0 && s.wa == 0 && s.tle == 0 && s.mle == 0);
         md << "| " << name

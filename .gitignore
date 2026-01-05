@@ -105,3 +105,8 @@ article
 experiments/experimental
 experiments/test_generator
 experiments/test.in
+experiments/memory_exp
+experiments/time_exp
+
+
+tmp
