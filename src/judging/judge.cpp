@@ -55,8 +55,6 @@ int main() {
                          alg + " " + test_path.string() + " " + out +
                          " 2> " + tmp;
 
-            // int ret = system(cmd.c_str());
-
             auto start = chrono::high_resolution_clock::now();
             int ret = system(cmd.c_str());
             auto end = chrono::high_resolution_clock::now();
@@ -64,7 +62,6 @@ int main() {
             double t_ms = chrono::duration<double, milli>(end - start).count();
 
             int mem = 0;
-            //double t_sec = 0;
             ifstream mf(tmp);
             mf >> mem;
 
@@ -114,15 +111,32 @@ int main() {
             double c;
             if (read_cost(out, c)) {
                 cost[name] = c;
+                if(c==-1) continue;
                 best = min(best, c);
             }
         }
 
+        double brute_cost = cost.count("brute") ? cost["brute"] : -1;
+
         for (auto &[name, c] : cost) {
-            if (fabs(c - best) < 1e-9)
-                summary[name].ok++;
-            else
+            if(brute_cost == -1)
+            {
+                if(c == -1) summary[name].ok++;
+                else  summary[name].bad++;
+                
+            }
+            else if(c==-1)
+            {
                 summary[name].bad++;
+            }
+
+            else if (c== best)
+            {
+                summary[name].ok++;
+            }
+            else summary[name].bad++;
+
+            
         }
     }
 
@@ -136,7 +150,9 @@ int main() {
         string name = fs::path(alg).filename().string();
         auto &s = summary[name];
 
-        bool pass = (s.wa == 0 && s.tle == 0 && s.mle == 0);
+        s.bad -= s.wa;
+
+        bool pass = (s.bad == 0 && s.wa == 0 && s.tle == 0 && s.mle == 0);
         md << "| " << name
            << " | " << (pass ? "✅" : "❌")
            << " | " << s.ok

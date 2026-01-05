@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <climits>
 #include "graph.hpp"
 #include "types.hpp"
 
@@ -26,7 +27,7 @@ namespace IO {
 
     inline void printSolution(const std::vector<Edge>& T) {
         if (T.empty()) {
-            std::cout << "-1\n";
+            std::cout << -1<< std::endl;
             return;
         }
 

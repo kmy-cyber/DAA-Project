@@ -48,7 +48,8 @@ void Main_Brute_Solver(Graph& G, std::vector<Edge>& T)
         }
 
 
-        if(valid && cost < bestCost) {
+        // Verificar que todos los vértices estén en la misma componente (árbol generador)
+        if(valid && dsu.getNumComponents() == 1 && cost < bestCost) {
             bestCost = cost;
             T = cand;
         }

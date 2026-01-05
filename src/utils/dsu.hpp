@@ -39,4 +39,13 @@ struct DSU {
                       << " Rank: " << rank[i] << std::endl;
         }
     }
+
+    int getNumComponents()
+    {
+        int components = 0;
+        for(int i = 0; i < (int)parent.size(); i++)
+            if(find(i) == i)
+                components++;
+        return components;
+    }
 };

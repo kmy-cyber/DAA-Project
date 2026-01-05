@@ -1,7 +1,7 @@
 # Nombre del compilador
 CXX = g++
 CXXFLAGS = -O2 -Wall
-CASES_TESTS = 20
+CASES_TESTS = 30
 # Nombre del ejecutable
 BIN = bin
 BRUTE = $(BIN)/brute

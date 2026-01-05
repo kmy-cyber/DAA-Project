@@ -52,10 +52,25 @@ bool bfsAvoidVertex(const Graph& G , int start, int end, int avoid)
 // Include all critical edges for degree-2 vertices based on Theorem 3
 // If there is no alternative path between its neighbors, include its edges in T*
 
+bool checkDegreeConstraints(const Graph& G, const vEdges& T) {
+    vi deg(G.n, 0);
+
+    for (const auto& e : T) {
+        deg[e.u]++;
+        deg[e.v]++;
+
+        if (deg[e.u] > G.b[e.u] || deg[e.v] > G.b[e.v]) {
+            std::cerr << "Degree constraint violated at edge: "
+                      << e.u << " - " << e.v << "\n";
+            return false;
+        }
+    }
+
+    return true; 
+}
 
 
-
-void Reduction_DCMST(Graph& G, std::vector<Edge>& T) {
+bool Reduction_DCMST(Graph& G, vEdges& T) {
     
     removeEdgesBetweenB1Vertices(G);
 
@@ -113,4 +128,14 @@ void Reduction_DCMST(Graph& G, std::vector<Edge>& T) {
 
     }
 
+
+    if(!checkDegreeConstraints(G,T)) return false;
+
+    return true;
+    
+
 }
+
+
+
+
