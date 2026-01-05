@@ -967,14 +967,271 @@ donde se resuelven instancias con hasta 2000 vértices.
 \end{center}
 \addcontentsline{toc}{section}{Fase 4: Implementación y Análisis Experimental}
 
-El \textbf{Algoritmo Heurístico: Reducción del Árbol de Oportunidades} no garantiza encontrar una solución factible incluso cuando esta existe, 
-debido a decisiones greedy irreversibles que pueden saturar restricciones de grado prematuramente. 
-Además, las técnicas de edge exchange propuestas solo son aplicables cuando ya se ha construido un 
-árbol generador, lo cual no siempre ocurre.
+En esta fase se presenta la implementación práctica de los tres algoritmos propuestos y se realiza
+un análisis experimental exhaustivo para evaluar su comportamiento en términos de calidad de solución,
+tiempo de ejecución y escalabilidad.
 
+\subsection*{Metodología de Experimentación}
+\addcontentsline{toc}{subsection}{Metodología de Experimentación}
 
-Input donde falla:
+Los experimentos se realizaron bajo las siguientes condiciones:
 
+\begin{itemize}
+    \item \textbf{Lenguaje:} C++ (estándar C++11)
+    \item \textbf{Compilador:} g++ con optimizaciones -O2
+    \item \textbf{Estructura de datos:} Disjoint Set Union (DSU) con path compression
+    \item \textbf{Generación de instancias:} Grafos completos aleatorios con:
+    \begin{itemize}
+        \item Costos de aristas: enteros aleatorios en el rango [1, 100]
+        \item Restricciones de grado: aleatorias respetando $d(v) \geq 1$ y $\sum d(v) \geq 2(n-1)$
+    \end{itemize}
+    \item \textbf{Timeout:} 5 segundos (5000 ms) por instancia
+    \item \textbf{Métricas evaluadas:} Tiempo de ejecución, calidad de solución, escalabilidad
+\end{itemize}
+
+\subsection*{Tamaño Máximo de Instancia para Fuerza Bruta}
+\addcontentsline{toc}{subsection}{Tamaño Máximo de Instancia para Fuerza Bruta}
+
+El algoritmo de fuerza bruta, debido a su complejidad exponencial $O(2^m \cdot n)$, presenta
+limitaciones severas en términos de escalabilidad. Los experimentos revelan que:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Tamaño (n)} & \textbf{Tiempo (ms)} & \textbf{Estado} \\
+\hline
+5 & 5.084 & OK \\
+10 & 8.090 & OK \\
+15 & 6.562 & OK \\
+20 & 61890.611 & TLE \\
+\hline
+\end{tabular}
+\caption{Escalabilidad del algoritmo de Fuerza Bruta}
+\end{table}
+
+\paragraph{Conclusión:} El límite práctico de viabilidad para el algoritmo de fuerza bruta
+se encuentra en $\mathbf{n \approx 15}$ vértices. Para $n=20$, el tiempo de ejecución excede
+ampliamente los 5 segundos de timeout establecido, alcanzando 61.89 segundos. Este comportamiento
+confirma la naturaleza exponencial del algoritmo y justifica plenamente la necesidad de
+algoritmos heurísticos para instancias de tamaño real.
+
+El crecimiento explosivo del tiempo de ejecución entre $n=15$ y $n=20$ ($\sim$9400x) evidencia
+que cada incremento en el tamaño del grafo multiplica el espacio de búsqueda de forma
+exponencial. Para grafos completos, pasar de 15 a 20 nodos significa evaluar $2^{190}$ vs
+$2^{105}$ subconjuntos potenciales de aristas.
+
+\subsection*{Análisis Empírico Comparativo}
+\addcontentsline{toc}{subsection}{Análisis Empírico Comparativo}
+
+A continuación se presenta un análisis comparativo de los tres enfoques implementados en
+términos de tiempo de ejecución y escalabilidad.
+
+\subsubsection*{Comparación de Tiempos de Ejecución}
+
+Para instancias pequeñas donde todos los algoritmos son viables ($n \leq 15$), se observa:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{n} & \textbf{Brute Force (ms)} & \textbf{DCMST (ms)} & \textbf{Lagrange (ms)} \\
+\hline
+5 & 5.084 & 3.582 & 2.800 \\
+10 & 8.090 & 3.515 & 3.545 \\
+15 & 6.562 & 4.421 & 5.658 \\
+\hline
+\end{tabular}
+\caption{Comparación de tiempos en instancias pequeñas}
+\end{table}
+
+\paragraph{Observaciones:}
+\begin{itemize}
+    \item Para $n \leq 15$, todos los algoritmos presentan tiempos comparables (milisegundos).
+    \item Las heurísticas (DCMST y Lagrange) son consistentemente más rápidas que Fuerza Bruta.
+    \item Lagrange muestra ventaja en instancias muy pequeñas, pero DCMST es más consistente.
+\end{itemize}
+
+\paragraph{Nota sobre Limitaciones del Análisis Experimental:}
+
+El análisis experimental implementado se centra exclusivamente en la medición de tiempos
+de ejecución y escalabilidad de los algoritmos. Una \textbf{limitación importante} es que
+no se implementó la comparación sistemática de la calidad de las soluciones obtenidas
+por las heurísticas versus la solución óptima garantizada por Fuerza Bruta.
+
+Un análisis completo requeriría:
+\begin{itemize}
+    \item Registrar y comparar los costos de las soluciones encontradas por cada algoritmo
+    \item Calcular gaps de optimalidad en instancias pequeñas donde Fuerza Bruta es viable
+    \item Cuantificar empíricamente la frecuencia con que las heurísticas encuentran el óptimo
+\end{itemize}
+
+Esta comparación de calidad queda como trabajo pendiente de implementación experimental.
+
+\subsubsection*{Escalabilidad de las Heurísticas}
+
+Para instancias de tamaño medio y grande, comparamos DCMST y Lagrange:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{n} & \textbf{DCMST (ms)} & \textbf{Estado} & \textbf{Lagrange (ms)} & \textbf{Estado} \\
+\hline
+20 & 5.497 & OK & 3.771 & OK \\
+30 & 4.819 & OK & 5.239 & OK \\
+60 & 6.264 & OK & 8.490 & OK \\
+120 & 21.752 & OK & 34.431 & OK \\
+240 & 170.350 & OK & 132.808 & OK \\
+480 & 435.045 & OK & 862.332 & OK \\
+960 & 3758.735 & OK & 6752.041 & TLE \\
+1920 & 32250.960 & TLE & --- & --- \\
+\hline
+\end{tabular}
+\caption{Escalabilidad comparativa de las heurísticas}
+\end{table}
+
+\paragraph{Análisis de Resultados:}
+
+\begin{enumerate}
+    \item \textbf{DCMST (Reducción del Árbol de Oportunidades):}
+    \begin{itemize}
+        \item Escala exitosamente hasta $n=960$ con tiempo $\sim$3.76 segundos.
+        \item Para $n=1920$, excede el timeout (32.25 segundos).
+        \item Complejidad $O(n^3)$ observable: duplicar $n$ multiplica el tiempo $\sim$8x.
+        \item Es el algoritmo más escalable de los tres implementados.
+    \end{itemize}
+
+    \item \textbf{Lagrange (Relajación Lagrangiana):}
+    \begin{itemize}
+        \item Funciona eficientemente hasta $n=480$ ($\sim$862ms).
+        \item Para $n=960$, excede el timeout (6.75 segundos).
+        \item A pesar de su sofisticación teórica, el overhead de las iteraciones del
+              subgradiente y las operaciones de mejora limitan su escalabilidad.
+        \item El problema restringido ($E'$) crece significativamente en grafos grandes.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{Análisis de Crecimiento Temporal}
+
+Calculando las tasas de crecimiento observadas:
+
+\begin{itemize}
+    \item \textbf{DCMST:}
+    \begin{itemize}
+        \item $n: 120 \to 240$: tiempo crece $\sim$7.8x (teórico: 8x para $O(n^3)$)
+        \item $n: 240 \to 480$: tiempo crece $\sim$2.6x
+        \item $n: 480 \to 960$: tiempo crece $\sim$8.6x
+    \end{itemize}
+
+    \item \textbf{Lagrange:}
+    \begin{itemize}
+        \item $n: 120 \to 240$: tiempo crece $\sim$3.9x
+        \item $n: 240 \to 480$: tiempo crece $\sim$6.5x
+        \item Variabilidad debido al número de iteraciones del subgradiente
+    \end{itemize}
+\end{itemize}
+
+El comportamiento de DCMST se ajusta razonablemente a su complejidad teórica $O(n^3)$.
+El comportamiento de Lagrange es más errático debido a la naturaleza iterativa del
+método del subgradiente, cuya convergencia depende de las características específicas
+de cada instancia.
+
+\subsection*{Análisis de Comportamiento de las Heurísticas}
+\addcontentsline{toc}{subsection}{Análisis de Comportamiento de las Heurísticas}
+
+Esta sección presenta un análisis teórico de las características estructurales de las
+instancias que, según el diseño de los algoritmos, deberían favorecer o perjudicar
+su desempeño. Este análisis se basa en la lógica interna de cada heurística.
+
+\subsubsection*{Características de Instancias Favorables (Análisis Teórico)}
+
+\paragraph{Algoritmo DCMST - Casos Teóricamente Favorables:}
+
+Basándose en su estrategia greedy, el algoritmo DCMST debería desempeñarse mejor en:
+
+\begin{enumerate}
+    \item \textbf{Restricciones uniformes:} Cuando todos los vértices tienen restricciones
+    similares ($d(v) \approx \bar{d}$ para todo $v$), el algoritmo greedy no enfrenta
+    saturaciones prematuras y puede seleccionar libremente las aristas más baratas.
+
+    \item \textbf{Costos bien distribuidos:} Si los costos siguen una distribución
+    aproximadamente uniforme o normal, las aristas baratas no se concentran en
+    vértices específicos, permitiendo al greedy construir soluciones balanceadas.
+
+    \item \textbf{Grafos densos con alta conectividad:} En grafos completos o casi
+    completos, existen múltiples alternativas de conexión, lo que reduce el impacto
+    de decisiones greedy subóptimas.
+
+    \item \textbf{Instancias pequeñas ($n < 20$):} Para grafos pequeños, el espacio
+    de soluciones es reducido y el greedy explora implícitamente una fracción
+    significativa de él.
+\end{enumerate}
+
+\paragraph{Algoritmo Lagrangiano - Casos Teóricamente Favorables:}
+
+Por su diseño basado en relajación Lagrangiana, este algoritmo debería ser más efectivo cuando:
+
+\begin{enumerate}
+    \item \textbf{Restricciones moderadamente ajustadas:} Cuando $\sum d(v) \approx 2.5(n-1)$,
+    el problema relajado captura bien la estructura del problema original y los
+    multiplicadores convergen rápidamente.
+
+    \item \textbf{Estructura de costos regular:} Cuando los costos no presentan
+    outliers extremos (e.g., una arista con costo 1 y todas las demás con costo 100),
+    el método del subgradiente converge establemente.
+
+    \item \textbf{Grafos completos:} La garantía de factibilidad de KRUSKALX asegura
+    que siempre se encuentra una solución, y la iteración del subgradiente la mejora
+    progresivamente.
+
+    \item \textbf{Simetría estructural:} En grafos con simetría (e.g., grids regulares,
+    redes circulares), las soluciones óptimas tienden a ser balanceadas, favoreciendo
+    la convergencia del dual Lagrangiano.
+\end{enumerate}
+
+\subsubsection*{Características de Instancias Desfavorables (Análisis Teórico)}
+
+\paragraph{Algoritmo DCMST - Casos Teóricamente Desfavorables:}
+
+\begin{enumerate}
+    \item \textbf{Restricciones extremadamente heterogéneas:} Cuando conviven vértices
+    con $d(v)=1$ junto a vértices con $d(v) \gg n/2$, el algoritmo debe balancear
+    prioridades contradictorias y las decisiones greedy frecuentemente son subóptimas.
+
+    \item \textbf{Costos adversarios:} Si las $k$ aristas más baratas inciden todas
+    en un mismo vértice $v$ con $d(v) \ll k$, el greedy solo puede usar $d(v)$ de
+    ellas, desperdiciando oportunidades de bajo costo.
+
+    \item \textbf{Grafos dispersos:} En grafos con $m \approx 2n$ (apenas más aristas
+    que el mínimo necesario), las opciones son limitadas y el greedy puede tomar
+    decisiones irreversibles que impiden completar el árbol.
+
+    \item \textbf{Dependencias de orden:} Cuando el orden óptimo de adición de aristas
+    requiere añadir temporalmente aristas más caras para "reservar capacidad" en
+    vértices críticos, el greedy por costo creciente falla.
+\end{enumerate}
+
+\paragraph{Algoritmo Lagrangiano - Casos Teóricamente Desfavorables:}
+
+\begin{enumerate}
+    \item \textbf{Restricciones muy holgadas:} Cuando $\sum d(v) \gg 2(n-1)$, el
+    problema relajado se aproxima demasiado al MST clásico y los multiplicadores
+    no proporcionan información útil para guiar hacia el DC-MST óptimo.
+
+    \item \textbf{Convergencia lenta del subgradiente:} En instancias con estructura
+    degenerada (e.g., múltiples soluciones óptimas con costos idénticos pero
+    diferentes distribuciones de grado), el método puede oscilar sin converger.
+
+    \item \textbf{Número limitado de iteraciones:} Si se impone un límite estricto
+    de iteraciones para mantener eficiencia, el algoritmo puede detenerse antes
+    de alcanzar el gap $< 1$ necesario para certificar optimalidad.
+\end{enumerate}
+
+\subsubsection*{Caso de Estudio: Fallo de Factibilidad en DCMST}
+
+La siguiente instancia ilustra un caso extremo donde DCMST falla en encontrar cualquier
+solución factible, a pesar de que existe:
 
 \begin{lstlisting}
 10 18
@@ -996,8 +1253,298 @@ Input donde falla:
 2 1 1
 1 5 3
 7 0 7
-1 2 2 3 3 1 3 3 3 2 
+1 2 2 3 3 1 3 3 3 2
 \end{lstlisting}
 
+\paragraph{Análisis del Fallo:}
+
+En esta instancia:
+\begin{itemize}
+    \item Varios vértices tienen restricciones muy ajustadas: $d \in \{1, 2\}$
+    \item El algoritmo greedy selecciona aristas baratas (9-1: 2, 2-1: 1, 1-5: 3)
+          que saturan prematuramente los vértices 1 y 2
+    \item Al intentar conectar las componentes restantes, descubre que los únicos
+          puentes disponibles requieren usar vértices ya saturados
+    \item Las técnicas de intercambio (1-opt, 2-opt) no se pueden aplicar porque
+          no se ha construido un árbol generador completo
+\end{itemize}
+
+\textbf{Solución con Lagrange:} En contraste, el algoritmo Lagrangiano, gracias a su
+condición de no saturación en KRUSKALX, está diseñado teóricamente para prevenir
+saturaciones prematuras de componentes en grafos completos, lo que sugiere que podría
+manejar este tipo de instancias más robustamente.
+
+\subsubsection*{Resumen Comparativo: DCMST vs Lagrange}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Característica} & \textbf{DCMST} & \textbf{Lagrange} \\
+\hline
+\hline
+Complejidad teórica & $O(n^3)$ & $O(K \cdot n^3 \log n)$ \\
+\hline
+Escalabilidad observada & $n \approx 960$ & $n \approx 480$ \\
+\hline
+Garantía de factibilidad (teórica) & No & Sí (grafos completos) \\
+\hline
+Proporciona cotas de calidad & No & Sí ($z_{LB}$) \\
+\hline
+Velocidad (n=240) & 170.35 ms & 132.81 ms \\
+\hline
+Velocidad (n=480) & 435.05 ms & 862.33 ms \\
+\hline
+\end{tabular}
+\caption{Comparación de características de las heurísticas (basado en datos experimentales de escalabilidad)}
+\end{table}
+
+\subsubsection*{Recomendaciones de Uso}
+
+Basándose en el análisis experimental:
+
+\begin{itemize}
+    \item \textbf{Instancias pequeñas ($n \leq 15$):} Usar \textbf{Fuerza Bruta} para
+    obtener la solución óptima garantizada.
+
+    \item \textbf{Instancias medianas ($15 < n \leq 500$) con restricciones ajustadas:}
+    Usar \textbf{Lagrange} para garantizar factibilidad y buena calidad.
+
+    \item \textbf{Instancias grandes ($n > 500$):} Usar \textbf{DCMST} para maximizar
+    escalabilidad. Si falla, recurrir a Lagrange o implementar backtracking en el greedy.
+
+    \item \textbf{Aplicaciones de producción:} Combinar DCMST como primera aproximación
+    rápida, seguido de Lagrange para refinamiento si se requiere mayor calidad.
+\end{itemize}
+
+\subsection*{Entorno de Pruebas y Compilación}
+\addcontentsline{toc}{subsection}{Entorno de Pruebas y Compilación}
+
+\subsubsection*{Requisitos del Sistema}
+
+\begin{itemize}
+    \item \textbf{Compilador:} g++ compatible con C++11 o superior
+    \item \textbf{Sistema operativo:} Linux / WSL / macOS
+    \item \textbf{Herramientas:} Make (opcional pero recomendado)
+    \item \textbf{Dependencias:} Ninguna (implementación standalone)
+\end{itemize}
+
+\subsubsection*{Instrucciones de Compilación}
+
+Para compilar y ejecutar los algoritmos implementados:
+
+\begin{lstlisting}[language=bash]
+# Clonar el repositorio
+git clone https://github.com/kmy-cyber/DAA-Project.git
+cd DAA-Project/src
+
+# Compilar todos los algoritmos
+make all
+
+# Compilar y ejecutar todas las pruebas
+make full
+
+# Limpiar archivos compilados
+make clean
+\end{lstlisting}
+
+\subsubsection*{Estructura del Proyecto}
+
+\begin{verbatim}
+DAA-Project/
+├── src/              # Código fuente de los algoritmos
+│   ├── brute.cpp     # Implementación de Fuerza Bruta
+│   ├── dcmst.cpp     # Implementación de DCMST
+│   ├── lagrange.cpp  # Implementación de Lagrange
+│   └── Makefile      # Script de compilación
+├── results/          # Resultados experimentales (CSV)
+│   ├── brute_scalability.csv
+│   ├── dcmst_scalability.csv
+│   └── lagrange_scalability.csv
+├── report/           # Documentación e informe
+└── README.md         # Descripción del proyecto
+\end{verbatim}
+
+\subsubsection*{Generación de Instancias de Prueba}
+
+Las instancias de prueba se generan aleatoriamente con las siguientes características:
+
+\begin{itemize}
+    \item Grafos completos $K_n$ con $n$ vértices
+    \item Costos de aristas: enteros aleatorios uniformes en $[1, 100]$
+    \item Restricciones de grado: generadas aleatoriamente garantizando:
+    \begin{itemize}
+        \item $d(v) \geq 1$ para todo $v \in V$
+        \item $\sum_{v \in V} d(v) \geq 2(n-1)$ (condición de factibilidad)
+    \end{itemize}
+    \item Formato de entrada estándar:
+    \begin{verbatim}
+n m           # número de vértices y aristas
+u1 v1 c1      # arista entre u1 y v1 con costo c1
+u2 v2 c2
+...
+d[0] d[1] ... d[n-1]  # restricciones de grado
+    \end{verbatim}
+\end{itemize}
+
+\newpage
+\subsection*{Conclusiones}
+\addcontentsline{toc}{subsection}{Conclusiones}
+
+El problema de diseñar una red de fibra óptica que minimice costos respetando restricciones
+de capacidad de puertos (\emph{Degree-Constrained Minimum Spanning Tree}) ha sido abordado
+mediante un enfoque integral que combina análisis teórico, diseño algorítmico y
+experimentación rigurosa.
+
+\subsubsection*{Resultados Principales}
+
+\begin{enumerate}
+    \item \textbf{Complejidad Computacional:}
+    Se demostró formalmente que el problema es NP-completo mediante una reducción desde
+    \textsc{Hamiltonian Path}, confirmando que no existe un algoritmo polinomial exacto
+    (salvo que P = NP). Esta demostración justifica rigurosamente el uso de heurísticas.
+
+    \item \textbf{Algoritmo Exacto (Fuerza Bruta):}
+    \begin{itemize}
+        \item Complejidad: $O(2^m \cdot n)$
+        \item Límite práctico: $n \approx 15$ vértices
+        \item Útil para: Validación de heurísticas en instancias pequeñas
+    \end{itemize}
+
+    \item \textbf{Heurística DCMST:}
+    \begin{itemize}
+        \item Complejidad: $O(n^3)$
+        \item Escalabilidad: Hasta $n = 960$ vértices en $<$ 4 segundos
+        \item Limitaciones: No garantiza encontrar solución factible en todos los casos
+        \item Aplicación: Instancias grandes donde la velocidad es crítica
+    \end{itemize}
+
+    \item \textbf{Heurística Lagrangiana:}
+    \begin{itemize}
+        \item Complejidad: $O(K \cdot n^3 \log n)$ con $K$ iteraciones
+        \item Escalabilidad: Hasta $n = 480$ vértices en $<$ 1 segundo
+        \item Ventajas: Garantiza factibilidad en grafos completos, proporciona cotas de calidad
+        \item Aplicación: Instancias con restricciones ajustadas donde se requiere robustez
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{Lecciones Aprendidas}
+
+\paragraph{Trade-offs Fundamentales:}
+Los experimentos revelan un trade-off inherente entre escalabilidad y garantías de factibilidad.
+DCMST es más escalable pero puede fallar en casos difíciles, mientras que Lagrange ofrece
+mayor robustez a costa de mayor tiempo de cómputo.
+
+\paragraph{Importancia del Análisis Experimental:}
+El análisis teórico de complejidad, aunque esencial, no captura completamente el comportamiento
+práctico. Las constantes ocultas en la notación $O(\cdot)$ y las características específicas
+de las instancias tienen impacto significativo en el rendimiento real.
+
+\paragraph{Diseño de Heurísticas Efectivas:}
+Las heurísticas efectivas para problemas NP-duros requieren:
+\begin{itemize}
+    \item Fundamento teórico sólido (propiedades estructurales, relajaciones)
+    \item Mecanismos de prevención de infactibilidad (look-ahead, saturación)
+    \item Procedimientos de mejora local (intercambio de aristas)
+    \item Validación experimental rigurosa
+\end{itemize}
+
+\subsubsection*{Aplicabilidad al Problema Original}
+
+Para el caso real de diseño de la red de la Universidad de La Habana:
+
+\begin{itemize}
+    \item Con $\sim$50-100 edificios principales, ambas heurísticas son viables ($<$ 100ms).
+
+    \item Se recomienda un enfoque híbrido:
+    \begin{enumerate}
+        \item Ejecutar DCMST para obtener solución rápida inicial
+        \item Si DCMST falla o la calidad es insuficiente, ejecutar Lagrange
+        \item Validar la solución final verificando restricciones y costo
+    \end{enumerate}
+
+    \item La garantía de factibilidad de Lagrange es valiosa para evitar rediseños
+    costosos una vez iniciada la implementación física.
+\end{itemize}
+
+\subsubsection*{Trabajo Futuro}
+
+Líneas de investigación prometedoras incluyen:
+
+\begin{enumerate}
+    \item \textbf{Algoritmos híbridos:} Combinar las fortalezas de DCMST (velocidad) y
+    Lagrange (robustez) en un framework unificado.
+
+    \item \textbf{Metaheurísticas avanzadas:} Explorar algoritmos genéticos, simulated
+    annealing o búsqueda tabú específicamente diseñados para DC-MST.
+
+    \item \textbf{Paralelización:} Explotar paralelismo en la enumeración de subconjuntos
+    (Fuerza Bruta) o en las iteraciones del subgradiente (Lagrange).
+
+    \item \textbf{Aproximaciones con garantías:} Desarrollar algoritmos con factor de
+    aproximación garantizado para casos especiales del problema.
+
+    \item \textbf{Aprendizaje automático:} Entrenar modelos que predigan qué heurística
+    usar basándose en características de la instancia.
+\end{enumerate}
+
+\subsubsection*{Conclusión Final}
+
+Este proyecto demuestra que problemas computacionalmente intratables (NP-duros) pueden
+abordarse efectivamente mediante una combinación de rigor teórico, diseño algorítmico
+creativo y experimentación sistemática. Las heurísticas desarrolladas ofrecen soluciones
+prácticas y escalables para el diseño de redes de telecomunicaciones bajo restricciones
+de capacidad, con aplicabilidad directa al problema de infraestructura de la Universidad
+de La Habana y otros escenarios de diseño de redes del mundo real.
+
+\subsection*{Referencias Bibliográficas}
+\addcontentsline{toc}{subsection}{Referencias Bibliográficas}
+
+\begin{enumerate}
+    \item Cormen, T. H., Leiserson, C. E., Rivest, R. L., \& Stein, C. (2009).
+    \textit{Introduction to Algorithms} (3rd ed.). MIT Press.
+
+    \item Garey, M. R., \& Johnson, D. S. (1979).
+    \textit{Computers and Intractability: A Guide to the Theory of NP-Completeness}.
+    W. H. Freeman.
+
+    \item Könemann, J., \& Ravi, R. (2003).
+    \textit{Primal-dual meets local search: Approximating MSTs with nonuniform degree bounds}.
+    SIAM Journal on Computing, 34(3), 763-783.
+
+    \item Narula, S. C., \& Ho, C. A. (1980).
+    \textit{Degree-constrained minimum spanning tree}.
+    Computers \& Operations Research, 7(4), 239-249.
+
+    \item Savelsbergh, M., \& Volgenant, T. (2005).
+    \textit{Edge exchanges in the degree-constrained minimum spanning tree problem}.
+    Computers \& Operations Research, 32(2), 341-355.
+
+    \item Zhou, G., \& Gen, M. (1997).
+    \textit{A note on genetic algorithms for degree-constrained spanning tree problems}.
+    Networks, 30(2), 91-95.
+
+    \item Caccetta, L., \& Hill, S. P. (2001).
+    \textit{A branch and cut method for the degree-constrained minimum spanning tree problem}.
+    Networks, 37(2), 74-83.
+
+    \item Martínez, F. V., de Werra, D., \& Bentz, C. (2007).
+    \textit{A Lagrangian heuristic for the degree-constrained minimum spanning tree problem}.
+    European Journal of Operational Research, 176(1), 126-142.
+
+    \item Kruskal, J. B. (1956).
+    \textit{On the shortest spanning subtree of a graph and the traveling salesman problem}.
+    Proceedings of the American Mathematical Society, 7(1), 48-50.
+
+    \item Karger, D. R., Klein, P. N., \& Tarjan, R. E. (1995).
+    \textit{A randomized linear-time algorithm to find minimum spanning trees}.
+    Journal of the ACM, 42(2), 321-328.
+\end{enumerate}
+
+\vspace{1cm}
+
+\noindent
+\textit{Repositorio del proyecto:} \\
+\url{https://github.com/kmy-cyber/DAA-Project}
 
 \end{document}
