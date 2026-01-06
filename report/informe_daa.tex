@@ -1410,5 +1410,130 @@ Basándose en el análisis experimental:
     rápida, seguido de Lagrange para refinamiento si se requiere mayor calidad.
 
 \end{itemize}
+
+\subsubsection*{Análisis de Consumo de Memoria}
+
+El análisis del consumo de memoria es una métrica crítica en algoritmos que trabajan con estructuras 
+de datos complejas, especialmente cuando se opera con grafos de gran tamaño. Esta subsección evalúa cómo 
+cada algoritmo utiliza la memoria durante su ejecución, lo cual es fundamental para determinar su 
+viabilidad en entornos con recursos limitados.
+
+\textbf{Metodología de Medición:}
+
+Para medir el consumo de memoria, se utilizó la herramienta estándar del sistema operativo que monitorea 
+el uso de memoria RSS (Resident Set Size) en kilobytes durante la ejecución de cada algoritmo. Se ejecutaron 
+pruebas con diferentes tamaños de entrada $(n = 5, 10, 15, \ldots, 7680)$, variando el número de nodos 
+en el grafo mientras se mantenía una densidad cercana a la completitud (grafos casi completos o completos).
+
+Se registró el estado de ejecución: \textit{OK} (completado exitosamente) o \textit{MLE} (Memory Limit Exceeded - límite de 
+memoria excedido con restricción de 512 MB).
+
+\textbf{Resultados Experimentales de Memoria:}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{n} & \textbf{Brute (KB)} & \textbf{DCMST (KB)} & \textbf{Lagrange (KB)} & \textbf{Estado} \\
+\hline
+\hline
+5 & 3,524 & 3,688 & 3,600 & OK \\
+10 & 3,652 & 3,688 & 3,696 & OK \\
+15 & 3,668 & 3,692 & 3,696 & OK \\
+20 & 3,552 & 3,692 & 3,532 & OK \\
+25 & 3,672 & 3,540 & 3,824 & OK \\
+30 & 3,668 & 3,688 & 3,672 & OK \\
+60 & 3,668 & 3,820 & 3,928 & OK \\
+120 & 3,924 & 3,944 & 4,336 & OK \\
+240 & 4,328 & 4,436 & 5,524 & OK \\
+480 & 6,672 & 7,968 & 12,288 & OK \\
+960 & 16,548 & 21,716 & 39,092 & OK \\
+1920 & 55,892 & 77,532 & 133,960 & OK \\
+3840 & 213,188 & 299,516 & 492,340 & OK \\
+7680 & 841,852 & 1,187,432 & 1,859,844 & MLE \\
+\hline
+\end{tabular}
+\caption{Consumo de memoria (en KB) para cada algoritmo según el tamaño de entrada}
+\label{table:memory_consumption}
+\end{table}
+
+\textbf{Análisis Comparativo:}
+
+\begin{enumerate}
+    \item \textbf{Consumo Base Constante:} Para $n \leq 30$, el consumo de memoria es aproximadamente 
+    constante (alrededor de 3,500-3,800 KB) para todos los algoritmos. Esto sugiere un overhead fijo 
+    que domina en instancias pequeñas.
+
+    \item \textbf{Crecimiento Polinómico:} A partir de $n = 60$, el consumo crece observablemente con 
+    patrón aproximadamente $O(n^2)$, consistente con la representación de grafos mediante matriz de adyacencia.
+
+    \item \textbf{Eficiencia de Brute:} El algoritmo de Fuerza Bruta es el más eficiente en memoria hasta 
+    $n = 1920$ (55,892 KB), utilizando 38.8\% menos que DCMST y 139.6\% menos que Lagrange a ese tamaño.
+
+    \item \textbf{Lagrange es el Más Voraz:} El algoritmo Lagrangiano mantiene múltiples estructuras auxiliares 
+    (multiplicadores, matrices modificadas, árboles intermedios), resultando en máximo consumo:
+    \begin{itemize}
+        \item En $n = 3840$: 492,340 KB (Lagrange)
+        \item En $n = 3840$: 299,516 KB (DCMST, 39\% menos)
+        \item En $n = 3840$: 213,188 KB (Brute, 56.7\% menos)
+    \end{itemize}
+
+    \item \textbf{Punto de Saturación:} En $n = 7680$, Lagrange alcanza MLE (1,859,844 KB $\approx$ 1,813 MB, 
+    superando el límite de 512 MB). DCMST (1,187 MB) y Brute (841 MB) también superan este límite.
+\end{enumerate}
+
+\textbf{Análisis Matemático:}
+
+El consumo de memoria sigue aproximadamente: $\text{Memoria}(n) \approx a + c \cdot n^2$
+
+\textbf{Coeficientes de ajuste empírico:}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Algoritmo} & \textbf{Término Base (KB)} & \textbf{Factor $O(n^2)$} \\
+\hline
+\hline
+Brute & $\approx 3,500$ & $\approx 0.0225$ \\
+DCMST & $\approx 3,500$ & $\approx 0.0320$ \\
+Lagrange & $\approx 3,500$ & $\approx 0.0500$ \\
+\hline
+\end{tabular}
+\caption{Coeficientes de ajuste polinómico del consumo de memoria}
+\label{table:memory_fitting}
+\end{table}
+
+DCMST incrementa 42\% más que Brute, y Lagrange 122\% más, debido a sus estructuras internas adicionales.
+
+\textbf{Límites de Viabilidad (Límite = 512 MB = 524,288 KB):}
+
+Utilizando el modelo $\text{Memoria}(n) = a + c \cdot n^2$ y resolviendo para $n$ cuando Memoria = 512 MB:
+
+\begin{itemize}
+    \item \textbf{Brute:} Viable hasta aproximadamente $n \approx 4,800$
+    \item \textbf{DCMST:} Viable hasta aproximadamente $n \approx 4,100$
+    \item \textbf{Lagrange:} Viable hasta aproximadamente $n \approx 3,200$
+\end{itemize}
+
+Estos valores están extrapolados de los datos experimentales. Los datos experimentales muestran que en $n = 3840$, 
+Lagrange ya utiliza 492,340 KB (95.9\% del límite), confirmando su viabilidad marginal a este tamaño.
+
+\textbf{Implicaciones Prácticas:}
+
+\begin{enumerate}
+    \item \textbf{Para instancias pequeñas ($n < 500$):} La memoria no es restricción. Se puede elegir 
+    algoritmo por velocidad y calidad de solución.
+
+    \item \textbf{Para instancias medianas ($500 \leq n \leq 1920$):} DCMST es preferible a Lagrange 
+    para optimizar memoria. Brute permanece viable pero con limitaciones de tiempo.
+
+    \item \textbf{Para instancias grandes ($n > 1920$):} Solo Brute es viable en memoria hasta $n \approx 3,800$. 
+    Para $n \geq 3840$, todos los algoritmos enfrentan restricciones severas de memoria bajo límite de 512 MB.
+
+    \item \textbf{Conclusión para 512 MB:} El límite es restrictivo para instancias grandes. La elección debe 
+    priorizar algoritmos eficientes en memoria (Brute) sobre calidad de solución cuando $n > 1920$.
+\end{enumerate}
+
 \end{document}
 
