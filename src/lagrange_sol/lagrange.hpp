@@ -10,9 +10,6 @@
 #include "kruskalResult.hpp"
 
 
-/* ========================================
-   Procedimiento de Mejora Local
-   ======================================== */
 void improvementProcedure(SpanningTree& tree, const Graph& G) {
     bool improved = true;
     int max_iterations = 100;
@@ -28,7 +25,6 @@ void improvementProcedure(SpanningTree& tree, const Graph& G) {
             // Remover arista e
             tree.removeEdge(e.u, e.v);
 
-            // Encontrar componentes
             DSU dsu(G.n);
             for (const Edge& te : tree.edges) {
                 dsu.merge(te.u, te.v);
@@ -37,7 +33,6 @@ void improvementProcedure(SpanningTree& tree, const Graph& G) {
             int comp_u = dsu.find(e.u);
             int comp_v = dsu.find(e.v);
 
-            // Buscar mejor arista de reconexión
             Edge best_edge = {-1, -1, std::numeric_limits<int>::max()};
             bool found = false;
 
@@ -74,17 +69,12 @@ void improvementProcedure(SpanningTree& tree, const Graph& G) {
                 tree.addEdge(best_edge);
                 improved = true;
             } else {
-                // Restaurar arista original
                 tree.addEdge(e);
             }
         }
     }
 }
 
-
-/* ========================================
-   Heurística Lagrangiana Principal
-   ======================================== */
 void lagrangianHeuristic(const Graph& G, vEdges& result) {
     const int n = G.n;
     const int m = G.edges.size();
@@ -118,10 +108,9 @@ void lagrangianHeuristic(const Graph& G, vEdges& result) {
             z_UB = best_tree.cost();
             found_feasible = true;
         } else {
-            // Intentar con múltiples inicializaciones aleatorias
+            
             std::vector<double> shuffled_costs(m);
             for (int attempt = 0; attempt < 10 && !found_feasible; attempt++) {
-                // Perturbar costos ligeramente
                 for (int i = 0; i < m; i++) {
                     shuffled_costs[i] = costs[i] * (1.0 + 0.01 * (attempt - 5));
                 }
@@ -140,14 +129,11 @@ void lagrangianHeuristic(const Graph& G, vEdges& result) {
     // Crear problema restringido
     int m_restricted = std::min(2 * std::max(initial.last_edge_index + 1, 10), m);
     
-    // Si no encontramos solución factible inicial, usar una solución parcial mejor que nada
     if (!found_feasible) {
-        // Intentar con la mejor solución parcial que tengamos
         if (initial.tree.edges.size() > 0) {
             best_tree = initial.tree;
-            z_UB = std::numeric_limits<ll>::max() / 2; // Valor alto para forzar búsqueda
+            z_UB = std::numeric_limits<ll>::max() / 2; 
         } else {
-            // Como último recurso, devolver vacío
             result.clear();
             return;
         }
@@ -276,7 +262,6 @@ void lagrangianHeuristic(const Graph& G, vEdges& result) {
         }
     }
 
-    // Retornar mejor solución encontrada (solo si es factible)
     if (best_tree.isFeasible(G.b) && best_tree.edges.size() == (size_t)(G.n - 1)) {
         result = best_tree.edges;
     } else {

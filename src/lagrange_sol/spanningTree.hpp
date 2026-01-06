@@ -78,11 +78,6 @@ SpanningTree classicMST(const Graph& G, const std::vector<double>& costs) {
 
 
 
-
-
-/* ========================================
-   Construcción greedy simple como fallback
-   ======================================== */
 SpanningTree simpleGreedy(const Graph& G, const std::vector<double>* custom_costs = nullptr) {
     SpanningTree tree(G.n);
     

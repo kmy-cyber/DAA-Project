@@ -31,10 +31,6 @@ int treeCapacity(const std::vector<int>& component, const vi& deg_limit) {
 }
 
 
-/* ========================================
-   KRUSKALX: Construcción con look-ahead
-   ======================================== */
-
 
 KruskalResult kruskalX(const Graph& G, const std::vector<double>& costs) {
     KruskalResult result(G.n);
@@ -91,7 +87,6 @@ KruskalResult kruskalX(const Graph& G, const std::vector<double>& costs) {
         int cap_v = treeCapacity(comp_v, G.b);
 
         // Condición de no saturación: delta(T1) + delta(T2) + 2 <= d(T1) + d(T2)
-        // Usamos <= en lugar de < para ser menos restrictivo
         if (delta_u + delta_v + 2 <= cap_u + cap_v) {
             result.tree.addEdge(e);
             deg[e.u]++;
