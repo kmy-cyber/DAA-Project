@@ -1535,5 +1535,38 @@ Lagrange ya utiliza 492,340 KB (95.9\% del límite), confirmando su viabilidad m
     priorizar algoritmos eficientes en memoria (Brute) sobre calidad de solución cuando $n > 1920$.
 \end{enumerate}
 
+\newpage
+
+\begin{center}
+\LARGE \textbf{Conclusiones y Trabajos Futuros}
+\end{center}
+\addcontentsline{toc}{section}{Conclusiones y Trabajos Futuros}
+
+Este proyecto ha presentado un análisis integral del problema Degree-Constrained Minimum Spanning Tree (DCMST), 
+demostrando formalmente su NP-completitud mediante reducción polinomial desde Hamiltonian Path. Se desarrollaron 
+e implementaron tres enfoques algorítmicos: Fuerza Bruta para optimalidad garantizada en instancias pequeñas, 
+DCMST greedy con optimizaciones locales para balance práctico, y Lagrangiano para garantizar factibilidad en 
+grafos densos.
+
+Los experimentos revelaron hallazgos significativos: el algoritmo Brute es viable hasta $n \approx 15$ debido a 
+complejidad exponencial, DCMST escala hasta $n \approx 960$ manteniendo buena calidad de solución ($< 5\%$ de 
+desviación), y Lagrange garantiza factibilidad pero con overhead computacional significativo . 
+La restricción de memoria de 512 MB impone un cuello de botella crítico en instancias grandes, limitando todos los 
+algoritmos a $n < 7,680$.
+
+En conclusión, para aplicaciones prácticas como el diseño de la red de la Universidad de La Habana, el algoritmo 
+DCMST es la opción más recomendada por su excelente balance entre velocidad, eficiencia de memoria y calidad de solución. 
+Aunque NP-completo, las heurísticas implementadas permiten resolver instancias de tamaño real en tiempo aceptable.
+
+Trabajos futuros deberían explorar: metaheurísticas como Simulated Annealing y Genetic Algorithms para mejor exploración 
+del espacio de soluciones; representaciones comprimidas de grafos (listas de adyacencia, formato CSR) para reducir 
+footprint de memoria; paralelización con OpenMP/CUDA para aprovechar arquitecturas modernas; evaluación en instancias 
+realistas de repositorios públicos (DIMACS, TSP Library) para validación contra literatura; y extensiones del problema 
+como múltiples árboles generadores con restricciones y variantes con pesos en nodos.
+
+El código desarrollado, los datos experimentales y esta documentación constituyen una contribución valiosa para futuras 
+investigaciones en optimización combinatoria y diseño de algoritmos, demostrando cómo la teoría de NP-completitud se 
+manifiesta en restricciones prácticas reales.
+
 \end{document}
 
