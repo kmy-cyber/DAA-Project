@@ -1,7 +1,8 @@
 #include <bits/stdc++.h>
+#include "config.hpp"
 using namespace std;
 
-static constexpr double TIME_LIMIT_MS = 5000.0;
+// static constexpr double TIME_LIMIT_MS = 5000.0;
 
 struct Algorithm {
     string name;
@@ -9,6 +10,10 @@ struct Algorithm {
 };
 
 int main() {
+
+    // Cargar configuración
+    Config cfg = loadConfig("config/config.yaml");
+    
     (void)system("mkdir -p experiments results");
 
     vector<int> Ns = {
@@ -53,7 +58,7 @@ int main() {
             string status;
             if (ret != 0)
                 status = "RE";
-            else if (t_ms > TIME_LIMIT_MS)
+            else if (t_ms > cfg.time_limit_ms)
                 status = "TLE";
             else
                 status = "OK";
@@ -64,7 +69,7 @@ int main() {
             cout << "n=" << n << " → "
                  << t_ms << " ms (" << status << ")\n";
 
-            if (t_ms > TIME_LIMIT_MS)
+            if (t_ms > cfg.time_limit_ms)
                 break;
         }
 

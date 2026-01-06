@@ -7,11 +7,11 @@ static constexpr double TIME_LIMIT_SEC = 5.0;
 static constexpr int MEMORY_LIMIT_KB = 512 * 1024;
 
 struct AlgoStats {
-    int ok = 0;        // 👌 óptimo
-    int bad = 0;       // 👎 subóptimo
-    int wa = 0;        // 💥 checker fail
-    int tle = 0;       // ⏰ time
-    int mle = 0;       // 🧠 memory
+    int ok = 0;        
+    int bad = 0;       
+    int wa = 0;        
+    int tle = 0;       
+    int mle = 0;       
 };
 
 bool read_cost(const string &file, double &cost) {

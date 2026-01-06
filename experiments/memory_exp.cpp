@@ -1,14 +1,18 @@
 #include <bits/stdc++.h>
+#include "config.hpp"
 using namespace std;
 
-static constexpr int MEMORY_LIMIT_KB = 512 * 1024; // 512 MB
 
 struct Algorithm {
     string name;
     string exec;
 };
 
+
 int main() {
+    // Cargar configuración desde YAML
+    Config cfg = loadConfig("config/config.yaml");
+    
     system("mkdir -p experiments results tmp");
 
     /* Tamaños base */
@@ -51,7 +55,7 @@ int main() {
             ifstream mf(memlog);
             mf >> mem_kb;
 
-            string status = (mem_kb > MEMORY_LIMIT_KB) ? "MLE" : "OK";
+            string status = (mem_kb > cfg.memory_limit_kb) ? "MLE" : "OK";
 
             csv << n << "," << mem_kb << "," << status << "\n";
             cout << "n=" << n << " → " << mem_kb << " KB (" << status << ")\n";
@@ -86,7 +90,7 @@ int main() {
                 ifstream mf(memlog);
                 mf >> mem_kb;
 
-                string status = (mem_kb > MEMORY_LIMIT_KB) ? "MLE" : "OK";
+                string status = (mem_kb > cfg.memory_limit_kb) ? "MLE" : "OK";
 
                 csv << n << "," << mem_kb << "," << status << "\n";
                 cout << "n=" << n << " → " << mem_kb << " KB (" << status << ")\n";

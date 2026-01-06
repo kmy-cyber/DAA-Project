@@ -1,0 +1,5 @@
+# Archivo de configuración para experimentos
+
+memory_limit_mb: 512
+
+time_limit_ms: 5000

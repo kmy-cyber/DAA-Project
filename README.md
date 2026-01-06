@@ -21,29 +21,88 @@ Una planificación subóptima podría resultar en un sobrecosto significativo pa
 
 ---
 
-##  Requisitos:
+## 🛠 Requisitos
 
-- `g++` (compatible con C++11 o superior)
-- Sistema tipo Linux / WSL / macOS
-- Make (opcional pero recomendado)
+Antes de comenzar, asegúrate de contar con lo siguiente:
+
+* **`g++`** (compatible con **C++11** o superior)
+* Sistema operativo tipo **Linux**, **WSL** o **macOS**
+* **Make** (opcional, pero **altamente recomendado**)
 
 ---
 
-## Primeros pasos
+## 🚀 Primeros pasos
 
-1. Clonar el repositorio:
+### 1️⃣ Clonar el repositorio
 
 ```bash
 git clone https://github.com/kmy-cyber/DAA-Project.git
 cd DAA-Project/src
 ```
 
-2. Compilar todo usando el Makefile:
+---
+
+### 2️⃣ Compilar el proyecto
+
+El proyecto incluye un **Makefile** para facilitar la compilación:
 
 ```bash
 make all
 make full
 make clean
+```
+
+> 💡 *Recomendación:* usa el `make one` en vez de `make full` para ejecutar con los pasos de tests que aparecen ahi y con los que hicieron las pruebas.
+
+---
+
+### 3️⃣ Revisar los resultados generados
+
+Luego de la ejecución, podrás encontrar los resultados en los siguientes directorios y archivos:
+
+* 📁 **`outputs/`**
+  Contiene la **solución producida por cada algoritmo implementado**.
+
+* 📁 **`logs/`**
+  Incluye **estadísticas detalladas** del comportamiento de cada algoritmo (tiempo, memoria, etc.).
+
+* 📄 **`output.md`**
+  Resumen con **estadísticas generales y comparativas** entre los algoritmos.
+
+---
+
+## 📊 Ejecución de experimentos de rendimiento
+
+Para evaluar **tiempo de ejecución, escalabilidad y consumo de memoria**, ejecuta el siguiente script:
+
+```bash
+cd src
+chmod +x experimental.sh
+./experimental.sh
+```
+
+### ¿Qué hace este script?
+
+* 🔹 Genera **instancias nuevas de grafos densos** con diferentes cantidades de vértices
+  (por ejemplo: `5, 10, 15, 20, ...`).
+* 🔹 Ejecuta **todos los algoritmos** sobre cada instancia.
+* 🔹 Crea el directorio **`results/`**, donde se almacenan los resultados de:
+
+  * ⏱ tiempo de ejecución
+  * 📈 escalabilidad
+  * 💾 consumo de memoria
+
+### Límites de ejecución
+
+Por defecto, los experimentos se ejecutan bajo las siguientes restricciones:
+
+* **Tiempo máximo:** `5 segundos`
+* **Memoria máxima:** `512 MB`
+
+Estos valores pueden modificarse en:
+
+```text
+config/config.yaml
 ```
 
 ---
