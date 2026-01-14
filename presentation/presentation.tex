@@ -15,49 +15,6 @@
 \begin{frame}{Índice}
   \tableofcontents
 \end{frame}
-% 1. Problema
-\section{Problema}
-
-\begin{frame}{Problema}
-La Universidad de La Habana busca modernizar su infraestructura de red conectando todos sus edificios principales con fibra óptica de alta velocidad, apoyados por ETECSA. El reto es diseñar una red eficiente y robusta, donde cada conexión tiene un costo y cada edificio tiene un límite de puertos (conexiones directas) debido a restricciones técnicas de los equipos de red. El objetivo es interconectar todos los edificios sin exceder los límites de puertos y minimizando el costo total de instalación.
-\end{frame}
-
-% 2. Formalización
-\section{Formalización}
-\begin{frame}{Formalización}
-El problema se modela como un grafo no dirigido $G=(V,E)$:
-\begin{itemize}
-  \item $V$: edificios principales
-  \item $E$: posibles enlaces de fibra óptica
-  \item $c(e)$: costo de cada enlace $e$
-  \item $d(v)$: límite de puertos en cada edificio $v$
-\end{itemize}
-Se busca un subgrafo $T$ tal que:
-\begin{itemize}
-  \item $T$ es conexo y acíclico (árbol generador)
-  \item $\deg_T(v) \leq d(v)$ para todo $v$
-  \item El costo total $\sum_{e \in T} c(e)$ es mínimo
-\end{itemize}
-\end{frame}
-
-% 3. Análisis de Complejidad}
-\section{Análisis de Complejidad}
-\begin{frame}{Análisis de Complejidad}
-\begin{itemize}
-  \item \textbf{Pertenencia a NP:} Dada una solución candidata (conjunto de aristas), se puede verificar en tiempo polinomial que:
-  \begin{itemize}
-    \item El subgrafo es conexo y acíclico (árbol)
-    \item Ningún vértice excede su límite de grado
-    \item El costo total no supera $K$
-  \end{itemize}
-  \item \textbf{NP-completitud:} Se demuestra por reducción desde el problema del Camino Hamiltoniano:
-  \begin{itemize}
-    \item Se construye una instancia donde los límites de grado son 2 y los costos son 1
-    \item Un árbol generador válido con esas restricciones corresponde a un camino hamiltoniano
-  \end{itemize}
-  \item \textbf{Implicación:} La versión de optimización (DC-MST) es NP-dura. No se conoce algoritmo polinomial para resolverlo en general, salvo que $\mathrm{P} = \mathrm{NP}$.
-\end{itemize}
-\end{frame}
 
 % Algoritmo Fuerza Bruta
 \section{Algoritmo Fuerza Bruta}
@@ -77,8 +34,9 @@ Se busca un subgrafo $T$ tal que:
 
 Por tanto, la complejidad temporal total del algoritmo es:
 \[
-  \mathcal{O}(2^{m} \cdot n)
+\mathcal{O}\Bigg(\binom{m}{n-1} \cdot n\Bigg)
 \]
+
 \end{frame}
 
 % Algoritmo Heurístico: Reducción del Árbol de Oportunidades
@@ -94,7 +52,7 @@ Por tanto, la complejidad temporal total del algoritmo es:
 \begin{itemize}
   \item Toda arista incidente a un vértice hoja debe estar en la solución.
   \item Ninguna arista entre dos vértices de grado máximo 1 puede estar en la solución si $|V|>2$.
-  \item Si un vértice de grado 2 conecta dos componentes, ambas aristas deben estar en la solución.
+  \item Si un vértice $v$ de grado 2 conecta dos v\'ertices $u$ y $w$, si no existe un camino entre $u$ y $w$ que no pase por $v$ entonces tanto $\{u,v\}$ como $\{u,w\}$ deben pertenecer a la soluci\'on.
 \end{itemize}
 \end{frame}
 
@@ -115,6 +73,66 @@ Por tanto, la complejidad temporal total del algoritmo es:
 \end{itemize}
 	\textbf{Ventaja:} Permite obtener soluciones de alta calidad en tiempo polinomial, viable para instancias grandes.
 \end{frame}
+
+
+\begin{frame}{Ejemplo}
+\begin{columns}
+    \column{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{1.png}
+        \small{Figura 1: Grafo Original}
+    \column{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{2.png}
+        \small{Figura 2: Grafo al quitarle la arista \{e,f\}}
+\end{columns}
+\end{frame}
+
+
+
+
+\begin{frame}{Ejemplo}
+\begin{columns}
+    \column{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{3.png}
+        \small{Figura 1: Grafo G}
+    \column{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{4.png}
+        \small{Figura 2: Grafo T*}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Ejemplo}
+\begin{columns}
+    \column{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{5.png}
+        \small{Figura 1: Grafo G  }
+    \column{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{6.png}
+        \small{Figura 2: Grafo T*}
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{Ejemplo}
+\begin{columns}
+    \column{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{7.png}
+        \small{Figura 1: Grafo G }
+    \column{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{8.png}
+        \small{Figura 2: Grafo T*}
+\end{columns}
+\end{frame}
+
 
 % Heurística Lagrangiana para DC-MST
 \section{Heurística Lagrangiana para DC-MST}
